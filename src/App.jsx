@@ -11,18 +11,21 @@ function PortalRoute() {
   const location = useLocation();
   const navigate = useNavigate();
   const requestedPage = location.hash.slice(1) || "dashboard";
+  const isLegacyDisciplineRoute = requestedPage === "discipline-monitoring";
   const validPortalPage = pages[requestedPage] && !standaloneIds.has(requestedPage);
 
   useEffect(() => {
-    if (standaloneIds.has(requestedPage)) {
+    if (isLegacyDisciplineRoute) {
+      navigate("/index.html#student-clearance", { replace: true });
+    } else if (standaloneIds.has(requestedPage)) {
       const standalone = standalonePages.find(([id]) => id === requestedPage);
       navigate(standalone[3], { replace: true });
     } else if (!validPortalPage) {
       navigate("/index.html#dashboard", { replace: true });
     }
-  }, [navigate, requestedPage, validPortalPage]);
+  }, [isLegacyDisciplineRoute, navigate, requestedPage, validPortalPage]);
 
-  if (!validPortalPage) return null;
+  if (!validPortalPage || isLegacyDisciplineRoute) return null;
 
   return (
     <AppLayout activePage={requestedPage}>

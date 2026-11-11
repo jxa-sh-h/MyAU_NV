@@ -8,10 +8,9 @@ export const student = {
 
 export const pages = {
   dashboard: { title: "Dashboard", section: "Overview", description: "Your academic snapshot and the latest campus updates." },
-  "student-clearance": { title: "Student Clearance", section: "Student Services", description: "Review your current balance, library circulation details, and other pending clearance items." },
-  enrollment: { title: "Enrollment", section: "Enrollment", description: "Review your enrolled subjects, advising requests, fees, and admission requirements." },
+  "student-clearance": { title: "Student Clearance", section: "Student Services", description: "Review payment clearance and violation clearance in one place." },
+  enrollment: { title: "Enrollment", section: "Enrollment", description: "Review your enrolled subjects, fees, and admission requirements." },
   "subjects-enrolled": { title: "Subjects Enrolled", section: "Enrollment", description: "Your registered subjects for the current academic term." },
-  "online-advising": { title: "Online Advising", section: "Enrollment", description: "Request a demonstration advising appointment with your academic adviser." },
   "fees-paid-during-enrollment": { title: "Fees Paid During Enrollment", section: "Enrollment", description: "A record of enrollment fees in this demonstration account." },
   "submit-admission-requirement": { title: "Submit Admission Requirement", section: "Enrollment", description: "Review and simulate an admission document submission." },
   "student-account": { title: "Student Account", section: "Student Account", description: "Review your student ledger and periodic dues." },
@@ -20,7 +19,6 @@ export const pages = {
   "academic-performance": { title: "Academic Performance", section: "Academic Records", description: "Review academic records and progress by category." },
   "check-list": { title: "Check List", section: "Academic Performance", description: "Review courses, earned units, and grades across your academic terms." },
   "academic-awards-achievements": { title: "Awards/Achievements", section: "Academic Performance", description: "Academic recognition recorded in the sample profile." },
-  "field-work-profile-ojt": { title: "Field Work Profile/OJT", section: "Academic Performance", description: "Field work profile and on-the-job training preparation." },
   "grading-per-exam-period": { title: "Grading Per Exam Period", section: "Academic Performance", description: "Sample grades by examination period." },
   "non-acad-performance": { title: "Non-Acad Performance", section: "Student Development", description: "Review membership and non-academic achievements." },
   membership: { title: "Membership", section: "Non-Acad Performance", description: "Student organizations and co-curricular participation." },
@@ -28,6 +26,7 @@ export const pages = {
   "discipline-monitoring": { title: "Discipline Monitoring", section: "Student Services", description: "Review demonstration notices and student conduct resources." },
   "personal-information": { title: "Personal Information", section: "Student Profile", description: "Review and manage your demonstration profile information." },
   "view-personal-info": { title: "View Personal Info", section: "Personal Information", description: "Fictional profile information for this frontend demonstration." },
+  "edit-personal-info": { title: "Edit Personal Information", section: "Personal Information", description: "Update demo contact information saved only in this browser." },
   "print-personal-info": { title: "Print Personal Info", section: "Personal Information", description: "Print the current personal information view." },
   "change-password": { title: "Change Password", section: "Personal Information", description: "Validate a demonstration password without saving it." },
   library: { title: "Library", section: "Library Services", description: "Explore library services and research resources." },
@@ -43,7 +42,6 @@ export const navigationGroups = [
     icon: "graduation",
     children: [
       ["subjects-enrolled", "Subjects Enrolled"],
-      ["online-advising", "Online Advising"],
       ["fees-paid-during-enrollment", "Fees Paid During Enrollment"],
       ["submit-admission-requirement", "Submit Admission Requirement"],
     ],
@@ -61,7 +59,6 @@ export const navigationGroups = [
     children: [
       ["check-list", "Check List"],
       ["academic-awards-achievements", "Awards/Achievements"],
-      ["field-work-profile-ojt", "Field Work Profile/OJT"],
       ["grading-per-exam-period", "Grading Per Exam Period"],
     ],
   },
@@ -96,6 +93,11 @@ export const notices = [
   { icon: "email", tone: "blue", title: "Keep your AUF email active", description: "Official university updates and account notices are sent to your AUF email.", time: "Reminder" },
 ];
 
+export const disciplineStatus = {
+  currentStanding: "Good",
+  activeNotices: [],
+};
+
 export const subjects = [
   ["CEDDES", "Computer Engineering Drafting and Design", "0.0 / 1.0", "1.0"],
   ["CISCO2", "CISCO 2", "2.0 / 1.0", "3.0"],
@@ -105,6 +107,17 @@ export const subjects = [
   ["INTHDL", "Introduction to HDL", "0.0 / 1.0", "1.0"],
   ["LOCIDE", "Logic Circuit and Design", "3.0 / 1.0", "4.0"],
   ["OPESYS", "Operating System", "3.0 / 0.0", "3.0"],
+];
+
+export const gradingRecords = [
+  { code: "CEDDES", instructor: "JUCO, WESTLY G.", midtermGrade: "100.0" },
+  { code: "CISCO2", instructor: "JUCO, WESTLY G.", midtermGrade: "98.0" },
+  { code: "DADICO", instructor: "LLANOS, WILBERT M.", midtermGrade: "94.0" },
+  { code: "ELECT1", instructor: "TECSON, JEREMY PIERRE C.", midtermGrade: "97.0" },
+  { code: "FECOSY", instructor: "TULAN, HERBERT O.", midtermGrade: "88.0" },
+  { code: "INTHDL", instructor: "LUNA, MARIO LORD S.", midtermGrade: "92.0" },
+  { code: "LOCIDE", instructor: "LUNA, MARIO LORD S.", midtermGrade: "96.0" },
+  { code: "OPESYS", instructor: "JUCO, WESTLY G.", midtermGrade: "99.0" },
 ];
 
 export const enrolledTerm = {
@@ -264,7 +277,6 @@ export const checkListTerms = [
 export const academicSections = [
   { id: "check-list", title: "Check List", description: pages["check-list"].description },
   { id: "academic-awards-achievements", title: "Awards/Achievements", description: pages["academic-awards-achievements"].description, rows: [["Dean’s List", "2nd Semester · AY 2025–2026"], ["Programming Challenge finalist", "College level · 2025"]] },
-  { id: "field-work-profile-ojt", title: "Field Work Profile/OJT", description: pages["field-work-profile-ojt"].description, rows: [["OJT orientation", "Completed"], ["Placement documents", "In progress"], ["Required hours", "For adviser confirmation"]] },
   { id: "grading-per-exam-period", title: "Grading Per Exam Period", description: pages["grading-per-exam-period"].description, rows: [["Preliminary", "88.4"], ["Midterm", "90.1"], ["Final", "Pending"]] },
 ];
 
