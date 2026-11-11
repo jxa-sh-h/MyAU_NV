@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { navigationGroups, notices, pages, standalonePages, student } from "../data/mockData.js";
 import Icon from "./Icon.jsx";
 
@@ -49,20 +49,19 @@ function NavigationGroup({ group, activePage, onNavigate }) {
 }
 
 function StudentPanel() {
-  const [showLogout, setShowLogout] = useState(false);
+  const navigate = useNavigate();
   return (
     <section className="student-panel" aria-label="Student information">
       <div className="student-panel-header">
         <div className="avatar avatar-large">AJ</div>
         <div className="student-info"><span className="student-id">{student.id}</span><strong title={student.name}>{student.name}</strong></div>
-        <button className="logout-button" type="button" aria-expanded={showLogout} onClick={() => setShowLogout((value) => !value)}>Logout</button>
+        <button className="logout-button" type="button" onClick={() => navigate("/")}>Logout</button>
       </div>
       <div className="student-meta">
         <span><small>Academic year</small><strong>{student.academicYear}</strong></span>
         <span><small>Year level</small><strong>{student.yearLevel}</strong></span>
         <span><small>Program</small><strong>{student.program}</strong></span>
       </div>
-      {showLogout && <p className="logout-status" role="status">Sign-out is not connected in this demonstration.</p>}
     </section>
   );
 }

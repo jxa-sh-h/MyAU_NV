@@ -14,35 +14,42 @@ export default function LoginPage() {
     <main className="login-page">
       <div className="login-layout">
         <section className="login-branding" aria-labelledby="login-title">
-          <div className="login-university-mark" aria-label="Angeles University Foundation">
-            <span>AUF</span>
+          <div className="login-title-lockup">
+            <img className="login-university-logo" src="/img/auf_logo.png" alt="Angeles University Foundation crest" />
+            <h1 id="login-title">MyAU</h1>
           </div>
-          <h1 id="login-title">AUF MyAU</h1>
+          <h2 className="login-brand-tagline">Your university, all in one place.</h2>
           <p>
-            The all-in-one portal for administrative staff, integrated school,
-            faculty members, parents, and students of Angeles University
-            Foundation to access essential university services, information, and
-            academic resources.
+            Access academic information, enrollment, student accounts, and
+            essential campus services through one convenient portal.
           </p>
         </section>
 
         <section className="login-card" aria-labelledby="login-card-title">
-          <h2 id="login-card-title">Student/Parent/New Student Login</h2>
+          <div className="login-card-heading">
+            <span className="login-card-eyebrow">Welcome to MyAU</span>
+            <h2 id="login-card-title">Sign in to continue</h2>
+            <p>Students, parents, and new students</p>
+          </div>
           <form className="login-form" onSubmit={signIn}>
-            <label htmlFor="login-username">Username:</label>
+            <label htmlFor="login-username">Username</label>
             <input id="login-username" name="username" type="text" autoComplete="username" />
-            <label htmlFor="login-password">Password:</label>
+            <label htmlFor="login-password">Password</label>
             <input id="login-password" name="password" type="password" autoComplete="current-password" />
             <button className="login-submit" type="submit">Login</button>
           </form>
 
-          <button className="login-text-link" type="button" onClick={() => setMessage("Password recovery is not available in this demo.")}>
+          <button className="login-text-link login-forgot-link" type="button" onClick={() => setMessage("Password recovery is not available in this demo.")}>
             Forgot password
           </button>
-          <button className="login-text-link login-register-link" type="button" onClick={() => setMessage("New student registration is not available in this demo.")}>
-            New student? Sign up here
-          </button>
           <p className="login-message" role="status" aria-live="polite">{message}</p>
+          <div className="login-register">
+            <span>New to AUF?</span>
+            <button className="login-text-link" type="button" onClick={() => setMessage("New student registration is not available in this demo.")}>
+              Sign up here
+            </button>
+          </div>
+          <p className="login-demo-note">Demo portal · Login does not require credentials</p>
         </section>
       </div>
     </main>
