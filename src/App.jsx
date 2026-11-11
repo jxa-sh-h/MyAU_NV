@@ -1,32 +1,56 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { useEffect } from "react";
+import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import AppLayout from "./components/AppLayout.jsx";
-import Dashboard from "./pages/Dashboard.jsx";
-import AcademicRecords from "./pages/AcademicRecords.jsx";
-import ClassSchedule from "./pages/ClassSchedule.jsx";
-import Enrollment from "./pages/Enrollment.jsx";
-import Clearance from "./pages/Clearance.jsx";
-import StudentProfile from "./pages/StudentProfile.jsx";
-import Payments from "./pages/Payments.jsx";
-import Library from "./pages/Library.jsx";
-import FacultyEvaluation from "./pages/FacultyEvaluation.jsx";
-import Settings from "./pages/Settings.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
+import PortalPage from "./pages/PortalPages.jsx";
+import { pages, standalonePages } from "./data/mockData.js";
 
-export default function App() {
+const standaloneIds = new Set(standalonePages.map(([id]) => id));
+
+function PortalRoute() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const requestedPage = location.hash.slice(1) || "dashboard";
+  const validPortalPage = pages[requestedPage] && !standaloneIds.has(requestedPage);
+
+  useEffect(() => {
+    if (standaloneIds.has(requestedPage)) {
+      const standalone = standalonePages.find(([id]) => id === requestedPage);
+      navigate(standalone[3], { replace: true });
+    } else if (!validPortalPage) {
+      navigate("/index.html#dashboard", { replace: true });
+    }
+  }, [navigate, requestedPage, validPortalPage]);
+
+  if (!validPortalPage) return null;
+
+  return (
+    <AppLayout activePage={requestedPage}>
+      <PortalPage pageId={requestedPage} />
+    </AppLayout>
+  );
+}
+
+function StandaloneRoute({ pageId }) {
+  return (
+    <AppLayout activePage={pageId}>
+      <PortalPage pageId={pageId} />
+    </AppLayout>
+  );
+}
+
+function App() {
   return (
     <Routes>
-      <Route element={<AppLayout />}>
-        <Route index element={<Dashboard />} />
-        <Route path="academic-records" element={<AcademicRecords />} />
-        <Route path="class-schedule" element={<ClassSchedule />} />
-        <Route path="enrollment" element={<Enrollment />} />
-        <Route path="clearance" element={<Clearance />} />
-        <Route path="profile" element={<StudentProfile />} />
-        <Route path="payments" element={<Payments />} />
-        <Route path="library" element={<Library />} />
-        <Route path="faculty-evaluation" element={<FacultyEvaluation />} />
-        <Route path="settings" element={<Settings />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Route>
+      <Route path="/" element={<LoginPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/index.html" element={<PortalRoute />} />
+      {standalonePages.map(([pageId, , , path]) => (
+        <Route key={pageId} path={path} element={<StandaloneRoute pageId={pageId} />} />
+      ))}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
+
+export default App;

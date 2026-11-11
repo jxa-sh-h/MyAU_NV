@@ -1,94 +1,297 @@
 export const student = {
-  id: "24-1661-908",
   name: "AGUIRRE, JOBERT...",
-  fullName: "Jobert Aguirre",
+  id: "24-1661-908",
   program: "BSCOE",
   yearLevel: "3RD YEAR",
   academicYear: "FS, 2026-27",
-  email: "jobert.aguirre@student.auf.edu.ph",
-  phone: "+63 917 555 0142",
-  address: "Angeles City, Pampanga",
 };
 
-export const announcements = [
+export const pages = {
+  dashboard: { title: "Dashboard", section: "Overview", description: "Your academic snapshot and the latest campus updates." },
+  "student-clearance": { title: "Student Clearance", section: "Student Services", description: "Review your current balance, library circulation details, and other pending clearance items." },
+  enrollment: { title: "Enrollment", section: "Enrollment", description: "Review your enrolled subjects, advising requests, fees, and admission requirements." },
+  "subjects-enrolled": { title: "Subjects Enrolled", section: "Enrollment", description: "Your registered subjects for the current academic term." },
+  "online-advising": { title: "Online Advising", section: "Enrollment", description: "Request a demonstration advising appointment with your academic adviser." },
+  "fees-paid-during-enrollment": { title: "Fees Paid During Enrollment", section: "Enrollment", description: "A record of enrollment fees in this demonstration account." },
+  "submit-admission-requirement": { title: "Submit Admission Requirement", section: "Enrollment", description: "Review and simulate an admission document submission." },
+  "student-account": { title: "Student Account", section: "Student Account", description: "Review your student ledger and periodic dues." },
+  ledger: { title: "Ledger", section: "Student Account", description: "A summary of charges and credits on your student account." },
+  "periodic-dues": { title: "Periodic Dues", section: "Student Account", description: "Your installment schedule and upcoming due dates." },
+  "academic-performance": { title: "Academic Performance", section: "Academic Records", description: "Review academic records and progress by category." },
+  "check-list": { title: "Check List", section: "Academic Performance", description: "Review courses, earned units, and grades across your academic terms." },
+  "academic-awards-achievements": { title: "Awards/Achievements", section: "Academic Performance", description: "Academic recognition recorded in the sample profile." },
+  "field-work-profile-ojt": { title: "Field Work Profile/OJT", section: "Academic Performance", description: "Field work profile and on-the-job training preparation." },
+  "grading-per-exam-period": { title: "Grading Per Exam Period", section: "Academic Performance", description: "Sample grades by examination period." },
+  "non-acad-performance": { title: "Non-Acad Performance", section: "Student Development", description: "Review membership and non-academic achievements." },
+  membership: { title: "Membership", section: "Non-Acad Performance", description: "Student organizations and co-curricular participation." },
+  "non-acad-awards-achievements": { title: "Awards/Achievements", section: "Non-Acad Performance", description: "Non-academic recognition recorded in the sample profile." },
+  "discipline-monitoring": { title: "Discipline Monitoring", section: "Student Services", description: "Review demonstration notices and student conduct resources." },
+  "personal-information": { title: "Personal Information", section: "Student Profile", description: "Review and manage your demonstration profile information." },
+  "view-personal-info": { title: "View Personal Info", section: "Personal Information", description: "Fictional profile information for this frontend demonstration." },
+  "print-personal-info": { title: "Print Personal Info", section: "Personal Information", description: "Print the current personal information view." },
+  "change-password": { title: "Change Password", section: "Personal Information", description: "Validate a demonstration password without saving it." },
+  library: { title: "Library", section: "Library Services", description: "Explore library services and research resources." },
+  "ebsco-database": { title: "EBSCO Database", section: "Library Services", description: "Open the external EBSCO research database." },
+  "faculty-evaluation": { title: "Faculty Evaluation", section: "Student Services", description: "Share course feedback in this demonstration evaluation." },
+  "online-payment": { title: "Online Payment", section: "Student Account", description: "Review a simulated account balance and payment options." },
+};
+
+export const navigationGroups = [
   {
-    id: "clearance",
-    title: "Clearance is in progress",
-    description: "Most offices have cleared your record. Review the remaining requirements.",
-    time: "Today",
-    tone: "teal",
+    id: "enrollment",
+    title: "Enrollment",
+    icon: "graduation",
+    children: [
+      ["subjects-enrolled", "Subjects Enrolled"],
+      ["online-advising", "Online Advising"],
+      ["fees-paid-during-enrollment", "Fees Paid During Enrollment"],
+      ["submit-admission-requirement", "Submit Admission Requirement"],
+    ],
   },
   {
-    id: "midterms",
-    title: "Midterm assessment period",
-    description: "Check your course pages for assessment schedules and instructor updates.",
-    time: "Nov 5",
-    tone: "amber",
+    id: "student-account",
+    title: "Student Account",
+    icon: "account",
+    children: [["ledger", "Ledger"], ["periodic-dues", "Periodic Dues"]],
   },
   {
-    id: "email",
-    title: "Keep your AUF email active",
-    description: "Official university updates are sent to your student email address.",
-    time: "Nov 2",
-    tone: "blue",
+    id: "academic-performance",
+    title: "Academic Performance",
+    icon: "award",
+    children: [
+      ["check-list", "Check List"],
+      ["academic-awards-achievements", "Awards/Achievements"],
+      ["field-work-profile-ojt", "Field Work Profile/OJT"],
+      ["grading-per-exam-period", "Grading Per Exam Period"],
+    ],
   },
+  {
+    id: "non-acad-performance",
+    title: "Non-Acad Performance",
+    icon: "star",
+    children: [["membership", "Membership"], ["non-acad-awards-achievements", "Awards/Achievements"]],
+  },
+  {
+    id: "personal-information",
+    title: "Personal Information",
+    icon: "user",
+    children: [
+      ["view-personal-info", "View Personal Info"],
+      ["print-personal-info", "Print Personal Info"],
+      ["change-password", "Change Password"],
+    ],
+  },
+];
+
+export const standalonePages = [
+  ["library", "Library", "book", "/pages/library.html"],
+  ["ebsco-database", "EBSCO Database", "book", "/pages/ebsco-database.html"],
+  ["faculty-evaluation", "Faculty Evaluation", "star", "/pages/faculty-evaluation.html"],
+  ["online-payment", "Online Payment", "wallet", "/pages/online-payment.html"],
+];
+
+export const notices = [
+  { icon: "check", tone: "teal", title: "Clearance is in progress", description: "Most offices have cleared your record. Two requirements still need your attention.", time: "Today" },
+  { icon: "calendar", tone: "amber", title: "Midterm assessment period", description: "Check your course pages for assessment schedules and instructor announcements.", time: "Oct 27" },
+  { icon: "email", tone: "blue", title: "Keep your AUF email active", description: "Official university updates and account notices are sent to your AUF email.", time: "Reminder" },
 ];
 
 export const subjects = [
-  { id: "cpe-311", code: "CPE 311", name: "Data Structures and Algorithms", units: 3, days: "Monday, Wednesday", time: "8:00–9:30 AM", room: "Engineering 204", instructor: "Engr. Maria Santos", grade: 91, period: "Midterm" },
-  { id: "cpe-312", code: "CPE 312", name: "Computer Organization", units: 3, days: "Tuesday, Thursday", time: "10:00–11:30 AM", room: "Engineering 301", instructor: "Engr. Paolo Reyes", grade: 89, period: "Midterm" },
-  { id: "cpe-313", code: "CPE 313", name: "Digital Systems Design", units: 3, days: "Monday, Wednesday", time: "1:00–2:30 PM", room: "Engineering Lab 2", instructor: "Engr. Camille Cruz", grade: 93, period: "Midterm" },
-  { id: "cpe-314", code: "CPE 314", name: "Engineering Design", units: 3, days: "Tuesday, Thursday", time: "1:00–2:30 PM", room: "Innovation Hub", instructor: "Engr. Daniel Lim", grade: 88, period: "Midterm" },
-  { id: "gec-108", code: "GEC 108", name: "Ethics", units: 3, days: "Friday", time: "9:00 AM–12:00 PM", room: "Humanities 105", instructor: "Dr. Andrea Dizon", grade: 90, period: "Midterm" },
-  { id: "cpe-315l", code: "CPE 315L", name: "Computer Engineering Laboratory", units: 3, days: "Friday", time: "1:00–4:00 PM", room: "Engineering Lab 1", instructor: "Engr. Maria Santos", grade: 92, period: "Midterm" },
-  { id: "pe-4", code: "PE 4", name: "Sports and Recreation", units: 3, days: "Wednesday", time: "4:00–5:30 PM", room: "AUF Gymnasium", instructor: "Coach Miguel Flores", grade: 95, period: "Midterm" },
+  ["CEDDES", "Computer Engineering Drafting and Design", "0.0 / 1.0", "1.0"],
+  ["CISCO2", "CISCO 2", "2.0 / 1.0", "3.0"],
+  ["DADICO", "Data and Digital Communications", "3.0 / 0.0", "3.0"],
+  ["ELECT1", "Cognate/Elective Course 1", "2.0 / 1.0", "3.0"],
+  ["FECOSY", "Feedback and Control System", "3.0 / 1.0", "4.0"],
+  ["INTHDL", "Introduction to HDL", "0.0 / 1.0", "1.0"],
+  ["LOCIDE", "Logic Circuit and Design", "3.0 / 1.0", "4.0"],
+  ["OPESYS", "Operating System", "3.0 / 0.0", "3.0"],
 ];
 
-export const availableSubjects = [
-  { id: "cpe-401", code: "CPE 401", name: "Embedded Systems", units: 3, days: "Monday, Wednesday", time: "10:00–11:30 AM", room: "Engineering 302", instructor: "Engr. Lara Mendoza", grade: null, period: "Not enrolled" },
-  { id: "cpe-402", code: "CPE 402", name: "Computer Networks", units: 3, days: "Tuesday, Thursday", time: "8:00–9:30 AM", room: "Engineering 205", instructor: "Engr. Paolo Reyes", grade: null, period: "Not enrolled" },
-  { id: "gec-112", code: "GEC 112", name: "The Contemporary World", units: 3, days: "Friday", time: "8:00–11:00 AM", room: "Humanities 202", instructor: "Dr. Andrea Dizon", grade: null, period: "Not enrolled" },
-  { id: "cpe-403l", code: "CPE 403L", name: "Microprocessor Laboratory", units: 1, days: "Thursday", time: "2:30–5:30 PM", room: "Engineering Lab 3", instructor: "Engr. Camille Cruz", grade: null, period: "Not enrolled" },
-];
-
-export const initialClearance = [
-  { id: "library", office: "Library", requirement: "Return one borrowed book", status: "Action needed" },
-  { id: "accounts", office: "Student Accounts", requirement: "No outstanding balance", status: "Cleared" },
-  { id: "laboratory", office: "Laboratory", requirement: "Equipment accountability", status: "Cleared" },
-  { id: "department", office: "Department", requirement: "Adviser consultation", status: "Cleared" },
-  { id: "registrar", office: "Registrar", requirement: "Enrollment documents", status: "Action needed" },
-];
-
-export const assessmentItems = [
-  { label: "Tuition fees", amount: 36500 },
-  { label: "Miscellaneous fees", amount: 6750 },
-  { label: "Laboratory fees", amount: 3250 },
-];
-
-export const initialPayments = [
-  { id: "payment-1", date: "Oct 16, 2026", description: "Installment payment · simulated", amount: 10000, status: "Demo record" },
-  { id: "payment-2", date: "Oct 02, 2026", description: "Initial installment · simulated", amount: 20000, status: "Demo record" },
-];
-
-export const initialBooks = [
-  { id: "book-1", title: "Introduction to Algorithms", author: "Cormen, Leiserson, Rivest & Stein", due: "Nov 18, 2026", status: "Borrowed" },
-  { id: "book-2", title: "Digital Design", author: "M. Morris Mano", due: "Nov 24, 2026", status: "Borrowed" },
-];
-
-export const pageInfo = {
-  dashboard: { title: "Welcome back", section: "Student Portal", description: "Your academic snapshot and the latest campus updates." },
-  "academic-records": { title: "Academic Records", section: "Academics", description: "Review your grades, academic standing, and semester information." },
-  "class-schedule": { title: "Class Schedule", section: "Academics", description: "Your weekly class schedule and assigned learning spaces." },
-  enrollment: { title: "Enrollment", section: "Student Services", description: "Review your registered load or explore simulated course offerings." },
-  clearance: { title: "Clearance", section: "Student Services", description: "Track demonstration clearance requirements by university office." },
-  profile: { title: "Student Profile", section: "My Account", description: "Manage your fictional student contact information." },
-  payments: { title: "Payments", section: "Student Account", description: "Review your mock assessment, balance, and payment history." },
-  library: { title: "Library", section: "University Services", description: "Review borrowed materials and library information." },
-  "faculty-evaluation": { title: "Faculty Evaluation", section: "University Services", description: "Share course feedback in this demonstration evaluation." },
-  settings: { title: "Settings", section: "Preferences", description: "Personalize your portal appearance and demo preferences." },
+export const enrolledTerm = {
+  label: "First Semester, 2026–2027",
+  officialDate: "July 16, 2026",
+  maximumUnits: "22.0",
+  totalUnits: "22.0",
 };
 
-export const demoNote = "Fictional demonstration data. This portal is not connected to official AUF systems.";
+export const ledgerEntries = [
+  ["—", "Old accounts", "—", "0.00", "0.00", "0.00"],
+  ["07/16/2026", "Tuition Fee", "—", "48,056.00", "—", "48,056.00"],
+  ["07/16/2026", "Miscellaneous Fee", "—", "6,848.00", "—", "54,904.00"],
+  ["07/16/2026", "Other Charges", "—", "17,810.00", "—", "72,714.00"],
+  ["07/16/2026", "Enrollment/downpayment - Cash", "Demo", "—", "5,000.00", "67,714.00"],
+  ["08/28/2026", "ACAD 25 (Grant)", "—", "—", "12,014.00", "55,700.00"],
+  ["11/03/2026", "Tuition - Cash", "Demo", "—", "10,000.00", "45,700.00"],
+  ["11/09/2026", "Tuition - Cash", "Demo", "—", "10,000.00", "35,700.00"],
+];
 
-export const formatPeso = (amount) =>
-  new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" }).format(amount);
+export const periodicDues = [
+  ["Prelim", "0.00", "0.00"],
+  ["Midterm", "17,133.34", "17,133.34"],
+  ["Final", "18,566.67", "35,700.00"],
+];
+
+export const checkListTerms = [
+  {
+    year: "1st Year",
+    semester: "1st Semester",
+    requiredUnits: 27,
+    creditedUnits: 27,
+    courses: [
+      { code: "CALCU1", title: "Calculus 1", units: 5, earnedUnits: 5, grade: 75, status: "passed" },
+      { code: "CHEM01", title: "Chemistry for Engineers", units: 4, earnedUnits: 4, grade: 87, status: "passed" },
+      { code: "COMDIS", title: "Computer Engineering as a Discipline", units: 2, earnedUnits: 2, grade: 95, status: "passed" },
+      { code: "MMW", title: "Mathematics in the Modern World", units: 3, earnedUnits: 3, grade: 95, status: "passed" },
+      { code: "NSTP1", title: "National Service Training Program I", units: 3, earnedUnits: 3, grade: 99, status: "passed" },
+      { code: "PEF1", title: "Physical Activity Towards Health and Fitness 1 (PATH-Fit 1)", units: 2, earnedUnits: 2, grade: 99, status: "passed" },
+      { code: "PROLOD", title: "Programming Logic and Design", units: 2, earnedUnits: 2, grade: 90, status: "passed" },
+      { code: "RPH", title: "Readings in Philippine History", units: 3, earnedUnits: 3, grade: 93, status: "passed" },
+      { code: "SSELEC", title: "Social Sciences Elective", units: 3, earnedUnits: 3, grade: 97, status: "passed" },
+    ],
+  },
+  {
+    year: "1st Year",
+    semester: "2nd Semester",
+    requiredUnits: 31,
+    creditedUnits: 31,
+    courses: [
+      { code: "AHELECT", title: "Arts & Humanities Elective", units: 3, earnedUnits: 3, grade: 92, status: "passed" },
+      { code: "CALCU2", title: "Calculus 2", units: 5, earnedUnits: 5, grade: 85, status: "passed" },
+      { code: "DISMAT", title: "Discrete Mathematics", units: 3, earnedUnits: 3, grade: 93, status: "passed" },
+      { code: "ENGDAT", title: "Engineering Data Analysis", units: 3, earnedUnits: 3, grade: 89, status: "passed" },
+      { code: "NSTP2", title: "National Service Training Program II", units: 3, earnedUnits: 3, grade: 97, status: "passed" },
+      { code: "OOPROG", title: "Object Oriented Programming", units: 2, earnedUnits: 2, grade: 96, status: "passed" },
+      { code: "PEF2", title: "Physical Activity Towards Health and Fitness 2 (PATH-Fit 2)", units: 2, earnedUnits: 2, grade: 96, status: "passed" },
+      { code: "PHYS01", title: "Physics for Engineers", units: 4, earnedUnits: 4, grade: 90, status: "passed" },
+      { code: "RLW", title: "Rizal’s Life, Works and Writings", units: 3, earnedUnits: 3, grade: 95, status: "passed" },
+      { code: "STS", title: "Science, Technology and Society", units: 3, earnedUnits: 3, grade: 93, status: "passed" },
+    ],
+  },
+  {
+    year: "2nd Year",
+    semester: "1st Semester",
+    requiredUnits: 24,
+    creditedUnits: 18,
+    courses: [
+      { code: "AITAPP", title: "Art Appreciation", units: 3, status: "credit-short" },
+      { code: "COMPAD", title: "Computer-Aided Drafting", units: 1, earnedUnits: 1, grade: 98, status: "passed" },
+      { code: "DASTAL", title: "Data Structure and Algorithm", units: 2, earnedUnits: 2, grade: 94, status: "passed" },
+      { code: "DIFFEQ", title: "Differential Equations", units: 3, earnedUnits: 3, grade: 87, status: "passed" },
+      { code: "EECIRC", title: "Fundamentals of Electrical Circuits", units: 4, earnedUnits: 4, grade: 86, status: "passed" },
+      { code: "ENECOM", title: "Engineering Economics", units: 3, status: "credit-short" },
+      { code: "PCOM", title: "Purposive Communication", units: 3, earnedUnits: 3, grade: 94, status: "passed" },
+      { code: "PEF3", title: "Physical Activity Towards Health and Fitness 3 (PATH-Fit 3)", units: 2, earnedUnits: 2, grade: 95, status: "passed" },
+      { code: "RRES", title: "Religions, Religious Experiences and Spirituality", units: 3, earnedUnits: 3, grade: 92, status: "passed" },
+    ],
+  },
+  {
+    year: "2nd Year",
+    semester: "2nd Semester",
+    requiredUnits: 25,
+    creditedUnits: 21,
+    courses: [
+      { code: "CISCO1", title: "CISCO 1", units: 3, earnedUnits: 3, grade: 93, status: "passed" },
+      { code: "CW", title: "The Contemporary World", units: 3, earnedUnits: 3, grade: 96, status: "passed" },
+      { code: "EECIRC", title: "Fundamentals of Electronic Circuits", units: 4, status: "credit-short" },
+      { code: "ETHICS", title: "Ethics", units: 3, earnedUnits: 3, grade: 85, status: "passed" },
+      { code: "NUMMET", title: "Numerical Methods", units: 3, earnedUnits: 3, grade: 98, status: "passed" },
+      { code: "PEF4", title: "Physical Activity Towards Health and Fitness 4 (PATH-Fit 4)", units: 2, earnedUnits: 2, grade: 97, status: "passed" },
+      { code: "SOFDES", title: "Software Design", units: 4, earnedUnits: 4, grade: 99, status: "passed" },
+      { code: "UTS", title: "Understanding the Self", units: 3, earnedUnits: 3, grade: 95, status: "passed" },
+    ],
+  },
+  {
+    year: "3rd Year",
+    semester: "1st Semester",
+    requiredUnits: 25,
+    creditedUnits: 21,
+    courses: [
+      { code: "CEDDES", title: "Computer Engineering Drafting and Design", units: 1, status: "enrolled" },
+      { code: "CISCO2", title: "CISCO 2", units: 3, status: "enrolled" },
+      { code: "DADICO", title: "Data and Digital Communications", units: 3, status: "enrolled" },
+      { code: "ELECT1", title: "Cognate/Elective Course 1", units: 3, status: "enrolled" },
+      { code: "FECOSY", title: "Feedback and Control System", units: 4, status: "enrolled" },
+      { code: "INTHDL", title: "Introduction to HDL", units: 1, status: "enrolled" },
+      { code: "LOCIDE", title: "Logic Circuit and Design", units: 4, status: "enrolled" },
+      { code: "OPESYS", title: "Operating System", units: 3, status: "enrolled" },
+    ],
+  },
+  {
+    year: "3rd Year",
+    semester: "2nd Semester",
+    requiredUnits: 24,
+    creditedUnits: 0,
+    courses: [
+      { code: "BOHASA", title: "Basic Occupational Health and Safety", units: 3, status: "no-credit" },
+      { code: "CISCO3", title: "CISCO 3", units: 3, status: "no-credit" },
+      { code: "CONESE", title: "Computer Networks and Security", units: 4, status: "no-credit" },
+      { code: "CPELAW", title: "CpE Laws and Professional Practice Arch", units: 2, status: "no-credit" },
+      { code: "ELECT2", title: "Cognate/Elective Course 2", units: 3, status: "no-credit" },
+      { code: "METRES", title: "Methods of Research", units: 2, status: "no-credit" },
+      { code: "MICROPI", title: "Microprocessors", units: 4, status: "no-credit" },
+      { code: "TECHNO", title: "Technopreneurship 101", units: 3, status: "no-credit" },
+    ],
+  },
+  {
+    year: "4th Year",
+    semester: "1st Semester",
+    requiredUnits: 25,
+    creditedUnits: 0,
+    courses: [
+      { code: "COMARC", title: "Computer Architecture and Organization", units: 4, status: "no-credit" },
+      { code: "DISIPR", title: "Digital Signal Processing", units: 4, status: "no-credit" },
+      { code: "ELECT3", title: "Cognate/Elective Course 3", units: 3, status: "no-credit" },
+      { code: "EMBESY", title: "Embedded Systems", units: 4, status: "no-credit" },
+      { code: "EMERTE", title: "Emerging Technologies in CpE", units: 3, status: "no-credit" },
+      { code: "FUNMSS", title: "Fundamentals of Mixed Signals and Sensors", units: 3, status: "no-credit" },
+      { code: "MOBDEV", title: "Mobile Application and Development", units: 3, status: "no-credit" },
+      { code: "PRADE1", title: "CpE Practice and Design 1", units: 1, status: "no-credit" },
+    ],
+  },
+  {
+    year: "4th Year",
+    semester: "2nd Semester",
+    requiredUnits: 6,
+    creditedUnits: 0,
+    courses: [
+      { code: "CPEOJT", title: "On the Job Training", units: 3, status: "no-credit" },
+      { code: "PRADE2", title: "CpE Practice and Design 2", units: 2, status: "no-credit" },
+      { code: "SEMTRI", title: "Seminars and Field Trips", units: 1, status: "no-credit" },
+    ],
+  },
+];
+
+export const academicSections = [
+  { id: "check-list", title: "Check List", description: pages["check-list"].description },
+  { id: "academic-awards-achievements", title: "Awards/Achievements", description: pages["academic-awards-achievements"].description, rows: [["Dean’s List", "2nd Semester · AY 2025–2026"], ["Programming Challenge finalist", "College level · 2025"]] },
+  { id: "field-work-profile-ojt", title: "Field Work Profile/OJT", description: pages["field-work-profile-ojt"].description, rows: [["OJT orientation", "Completed"], ["Placement documents", "In progress"], ["Required hours", "For adviser confirmation"]] },
+  { id: "grading-per-exam-period", title: "Grading Per Exam Period", description: pages["grading-per-exam-period"].description, rows: [["Preliminary", "88.4"], ["Midterm", "90.1"], ["Final", "Pending"]] },
+];
+
+export const nonAcademicSections = [
+  { id: "membership", title: "Membership", description: pages.membership.description, rows: [["AUF Computer Engineering Society", "Active member"], ["Campus Robotics Circle", "Participant"]] },
+  { id: "non-acad-awards-achievements", title: "Awards/Achievements", description: pages["non-acad-awards-achievements"].description, rows: [["Inter-college robotics showcase", "Participant · 2026"], ["Student volunteer appreciation", "Recognition · 2025"]] },
+];
+
+export const currentBalance = {
+  amount: "₱15,750.00",
+  status: "Outstanding",
+};
+
+export const circulationDetails = [
+  ["Books due now", "1"],
+  ["Overdue books", "1"],
+  ["Unpaid library fine", "₱12.00"],
+];
+
+export const otherPendingClearances = [
+  ["Student Affairs", "Amount: ₱0 · Qty: N/A", "No-uniform notice", "—", "Nov 3, 2026", "Nov 10, 2026"],
+];
+
+export const profileRows = [
+  ["Student ID", student.id],
+  ["Student name", student.name],
+  ["Program", student.program],
+  ["Year level", student.yearLevel],
+  ["Academic year", student.academicYear],
+];

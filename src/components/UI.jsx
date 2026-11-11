@@ -1,116 +1,118 @@
-import { useEffect, useRef } from "react";
+import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import Icon from "./Icon.jsx";
 
-export function PageHeader({ section, title, description, actions }) {
+export function PageHeading({ page, children }) {
   return (
     <div className="page-heading">
       <div>
-        <p className="eyebrow">{section}</p>
-        <h1>{title}</h1>
-        <p>{description}</p>
+        <p className="eyebrow">{page.section}</p>
+        <h1>{page.title}</h1>
+        <p>{page.description}</p>
       </div>
-      {actions ? <div className="heading-actions">{actions}</div> : null}
+      {children}
     </div>
   );
 }
 
-export function Panel({ title, subtitle, actions, children, className = "" }) {
+export function Panel({ title, subtitle, children, className = "" }) {
   return (
     <section className={`panel content-panel ${className}`.trim()}>
-      {(title || subtitle || actions) && (
-        <div className="panel-header">
-          <div>
-            {title ? <h2>{title}</h2> : null}
-            {subtitle ? <p>{subtitle}</p> : null}
-          </div>
-          {actions}
+      <div className="panel-header">
+        <div>
+          <h2>{title}</h2>
+          {subtitle && <p>{subtitle}</p>}
         </div>
-      )}
+      </div>
       <div className="panel-body">{children}</div>
     </section>
   );
 }
 
-export function DataTable({ columns, rows, label, emptyMessage = "No matching records." }) {
-  return (
-    <div className="table-scroll" role="region" aria-label={label} tabIndex="0">
-      <table>
-        <thead><tr>{columns.map((column) => <th key={column.key} scope="col">{column.label}</th>)}</tr></thead>
-        <tbody>
-          {rows.length ? rows.map((row) => (
-            <tr key={row.id ?? row[columns[0].key]}>
-              {columns.map((column) => <td key={column.key}>{column.render ? column.render(row) : row[column.key]}</td>)}
-            </tr>
-          )) : <tr><td className="empty-cell" colSpan={columns.length}>{emptyMessage}</td></tr>}
-        </tbody>
-      </table>
-    </div>
-  );
+export function Badge({ children, tone = "success" }) {
+  const toneClass = tone === "warning" ? "badge-warning" : tone === "pending" ? "badge-neutral" : "badge-success";
+  return <span className={`badge ${toneClass}`}>{children}</span>;
 }
 
-export function StatusBadge({ children, tone = "success" }) {
-  const className = tone === "warning" ? "badge-warning" : tone === "neutral" ? "badge-neutral" : "badge-success";
-  return <span className={`badge ${className}`}>{children}</span>;
-}
-
-export function DemoNote({ children = "Fictional demonstration data. This portal is not connected to official AUF systems." }) {
+export function DemoNote({ children = "Fictional demonstration data. This page is not connected to official AUF systems." }) {
   return <p className="demo-note">{children}</p>;
 }
 
-export function StatCard({ icon, label, value, detail, tone = "teal" }) {
-  return (
-    <article className="summary-card">
-      <span className={`summary-icon ${tone}`}><Icon name={icon} /></span>
-      <div className="summary-details">
-        <span className="summary-label">{label}</span>
-        <strong className="summary-value">{value}</strong>
-        {detail ? <span className="summary-meta">{detail}</span> : null}
-      </div>
-    </article>
-  );
-}
-
-export function EmptyState({ title, description, action }) {
-  return (
-    <div className="empty-state">
-      <span className="placeholder-icon"><Icon name="search" /></span>
-      <h2>{title}</h2>
-      <p>{description}</p>
-      {action}
-    </div>
-  );
-}
-
-export function Modal({ title, description, onClose, children, labelledBy = "dialog-title" }) {
-  const dialogRef = useRef(null);
-
-  useEffect(() => {
-    const previousFocus = document.activeElement;
-    dialogRef.current?.focus();
-    function handleKeyDown(event) {
-      if (event.key === "Escape") onClose();
-    }
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      previousFocus?.focus?.();
-    };
-  }, [onClose]);
-
-  return (
-    <div className="modal-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
-      <section className="dialog-card" role="dialog" aria-modal="true" aria-labelledby={labelledBy} tabIndex="-1" ref={dialogRef}>
-        <div className="dialog-header">
-          <div><h2 id={labelledBy}>{title}</h2>{description ? <p>{description}</p> : null}</div>
-          <button className="icon-button dialog-close" type="button" onClick={onClose} aria-label="Close dialog"><Icon name="close" /></button>
-        </div>
-        <div className="dialog-content">{children}</div>
-      </section>
-    </div>
-  );
-}
-
 export function Feedback({ children, tone = "success" }) {
-  if (!children) return null;
-  return <p className={`feedback-message ${tone}`} role="status" aria-live="polite">{children}</p>;
+  return children ? <p className={`form-feedback feedback-${tone}`} role="status" aria-live="polite">{children}</p> : null;
+}
+
+export function DataTable({ headers, rows, label, searchable = false, sortable = false }) {
+  const [query, setQuery] = useState("");
+  const [sort, setSort] = useState({ column: -1, direction: "ascending" });
+
+  const visibleRows = useMemo(() => {
+    let result = rows;
+    if (searchable && query.trim()) {
+      const needle = query.trim().toLocaleLowerCase();
+      result = result.filter((row) => row.some((cell) => typeof cell === "string" && cell.toLocaleLowerCase().includes(needle)));
+    }
+    if (sortable && sort.column >= 0) {
+      result = [...result].sort((a, b) => String(a[sort.column]).localeCompare(String(b[sort.column]), undefined, { numeric: true }));
+      if (sort.direction === "descending") result.reverse();
+    }
+    return result;
+  }, [query, rows, searchable, sort]);
+
+  function toggleSort(column) {
+    setSort((current) => ({
+      column,
+      direction: current.column === column && current.direction === "ascending" ? "descending" : "ascending",
+    }));
+  }
+
+  return (
+    <>
+      {searchable && (
+        <div className="table-toolbar">
+          <label className="table-search">
+            <span className="visually-hidden">Search {label}</span>
+            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={`Search ${label.toLocaleLowerCase()}`} />
+          </label>
+          <span className="table-result-count">{visibleRows.length} of {rows.length} records</span>
+        </div>
+      )}
+      <div className="table-scroll" role="region" aria-label={label} tabIndex="0">
+        <table>
+          <thead>
+            <tr>{headers.map((header, index) => (
+              <th scope="col" key={header}>
+                {sortable ? (
+                  <button className="sortable-header" type="button" onClick={() => toggleSort(index)} aria-label={`Sort by ${header}`}>
+                    {header}{sort.column === index ? (sort.direction === "ascending" ? " ↑" : " ↓") : ""}
+                  </button>
+                ) : header}
+              </th>
+            ))}</tr>
+          </thead>
+          <tbody>
+            {visibleRows.length > 0 ? visibleRows.map((row, rowIndex) => (
+              <tr key={`${label}-${rowIndex}`}>{row.map((cell, cellIndex) => (
+                <td className={cellIndex === row.length - 1 ? "table-last-cell" : ""} key={`${label}-${rowIndex}-${cellIndex}`}>{cell}</td>
+              ))}</tr>
+            )) : <tr><td colSpan={headers.length}><span className="empty-state">No matching records found.</span></td></tr>}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+
+export function SectionCards({ links }) {
+  return (
+    <div className="section-overview-grid">
+      {links.map(({ id, title, description }) => (
+        <Link className="service-card section-card-link" to={`/index.html#${id}`} key={id}>
+          <span className="service-title"><span className="service-icon"><Icon name="file" /></span><strong>{title}</strong></span>
+          <p>{description}</p>
+          <span className="service-action">View section <Icon name="arrow" /></span>
+        </Link>
+      ))}
+    </div>
+  );
 }

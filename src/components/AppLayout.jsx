@@ -1,216 +1,166 @@
 import { useEffect, useRef, useState } from "react";
-import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { announcements, pageInfo, student } from "../data/mockData.js";
-import { useLocalStorage } from "../hooks/useLocalStorage.js";
+import { Link } from "react-router-dom";
+import { navigationGroups, notices, pages, standalonePages, student } from "../data/mockData.js";
 import Icon from "./Icon.jsx";
-import { Modal } from "./UI.jsx";
 
-const navigationGroups = [
-  {
-    title: "Academics",
-    icon: "book",
-    links: [
-      { to: "/academic-records", label: "Academic Records", icon: "check" },
-      { to: "/class-schedule", label: "Class Schedule", icon: "calendar" },
-    ],
-  },
-  {
-    title: "Student Services",
-    icon: "check",
-    links: [
-      { to: "/enrollment", label: "Enrollment", icon: "book" },
-      { to: "/clearance", label: "Clearance", icon: "check" },
-    ],
-  },
-  {
-    title: "My Account",
-    icon: "user",
-    links: [
-      { to: "/profile", label: "Student Profile", icon: "user" },
-      { to: "/payments", label: "Payments", icon: "wallet" },
-    ],
-  },
-  {
-    title: "University Services",
-    icon: "book",
-    links: [
-      { to: "/library", label: "Library", icon: "book" },
-      { to: "/faculty-evaluation", label: "Faculty Evaluation", icon: "check" },
-    ],
-  },
-];
-const defaultPreferences = { announcements: true, reminders: true, compactTables: false };
+function routeFor(id) {
+  const standalone = standalonePages.find(([pageId]) => pageId === id);
+  return standalone ? standalone[3] : `/index.html#${id}`;
+}
+
+function NavLink({ id, label, icon, activePage, onNavigate, className = "" }) {
+  const isActive = activePage === id;
+  return (
+    <Link
+      className={`${className || "nav-link"}${isActive ? " active" : ""}`}
+      to={routeFor(id)}
+      aria-current={isActive ? (standalonePages.some(([pageId]) => pageId === id) ? "page" : "location") : undefined}
+      onClick={onNavigate}
+    >
+      {icon && <Icon name={icon} />}
+      <span>{label}</span>
+    </Link>
+  );
+}
+
+function NavigationGroup({ group, activePage, onNavigate }) {
+  const isCurrent = activePage === group.id || group.children.some(([id]) => id === activePage);
+  const [expanded, setExpanded] = useState(isCurrent);
+
+  useEffect(() => {
+    if (isCurrent) setExpanded(true);
+  }, [isCurrent]);
+
+  return (
+    <div className="nav-group">
+      <div className={`nav-group-heading${activePage === group.id ? " active" : ""}`}>
+        <NavLink id={group.id} label={group.title} icon={group.icon} activePage={activePage} onNavigate={onNavigate} className="nav-group-page" />
+        <button className="nav-group-toggle" type="button" aria-label={`${expanded ? "Collapse" : "Expand"} ${group.title}`} aria-expanded={expanded} aria-controls={`${group.id}-links`} onClick={() => setExpanded((value) => !value)}>
+          <Icon name="chevron" className="group-chevron" />
+        </button>
+      </div>
+      <div className="nav-submenu" id={`${group.id}-links`} hidden={!expanded}>
+        {group.children.map(([id, label]) => (
+          <NavLink key={id} id={id} label={label} activePage={activePage} onNavigate={onNavigate} />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function StudentPanel() {
-  const [logoutMessage, setLogoutMessage] = useState("");
-
+  const [showLogout, setShowLogout] = useState(false);
   return (
     <section className="student-panel" aria-label="Student information">
       <div className="student-panel-header">
-        <div className="avatar avatar-large" aria-hidden="true">AJ</div>
+        <div className="avatar avatar-large">AJ</div>
         <div className="student-info"><span className="student-id">{student.id}</span><strong title={student.name}>{student.name}</strong></div>
-        <button className="logout-button" type="button" onClick={() => setLogoutMessage("Sign-out is not connected in this demonstration.")}>Logout</button>
+        <button className="logout-button" type="button" aria-expanded={showLogout} onClick={() => setShowLogout((value) => !value)}>Logout</button>
       </div>
       <div className="student-meta">
         <span><small>Academic year</small><strong>{student.academicYear}</strong></span>
         <span><small>Year level</small><strong>{student.yearLevel}</strong></span>
         <span><small>Program</small><strong>{student.program}</strong></span>
       </div>
-      {logoutMessage ? <p className="logout-status" role="status">{logoutMessage}</p> : null}
+      {showLogout && <p className="logout-status" role="status">Sign-out is not connected in this demonstration.</p>}
     </section>
   );
 }
 
-function Sidebar({ mobileOpen, collapsed, closeMobile, expandSidebar }) {
-  const location = useLocation();
-  const activeGroupTitle = navigationGroups.find((group) => group.links.some((link) => location.pathname.startsWith(link.to)))?.title;
-  const [expanded, setExpanded] = useState(activeGroupTitle ?? "");
+function Header({ menuOpen, onMenuToggle, menuButtonRef }) {
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const notificationRef = useRef(null);
+  const profileRef = useRef(null);
 
   useEffect(() => {
-    if (activeGroupTitle) setExpanded(activeGroupTitle);
-  }, [activeGroupTitle]);
+    function dismiss(event) {
+      if (!notificationRef.current?.contains(event.target)) setNotificationsOpen(false);
+      if (!profileRef.current?.contains(event.target)) setProfileOpen(false);
+    }
+    document.addEventListener("pointerdown", dismiss);
+    return () => document.removeEventListener("pointerdown", dismiss);
+  }, []);
 
-  return (
-    <>
-      {mobileOpen ? <button className="sidebar-scrim" type="button" aria-label="Close navigation" onClick={closeMobile} /> : null}
-      <aside className={`sidebar${mobileOpen ? " is-open" : ""}${collapsed ? " is-collapsed" : ""}`} id="sidebar" aria-label="Main navigation">
-        <StudentPanel />
-        <nav className="primary-nav" aria-label="Student portal">
-          <NavLink to="/" end aria-label="Dashboard" title={collapsed ? "Dashboard" : undefined} className={({ isActive }) => `nav-link${isActive ? " active" : ""}`} onClick={() => closeMobile()}>
-            <Icon name="dashboard" /><span>Dashboard</span>
-          </NavLink>
-          {navigationGroups.map((group) => {
-            const isExpanded = expanded === group.title;
-            return (
-              <section className="nav-group" key={group.title}>
-                <div className="nav-group-heading">
-                  <span className="nav-group-label"><Icon name={group.icon} /><span>{group.title}</span></span>
-                  <button
-                    className="nav-group-toggle"
-                    type="button"
-                    aria-label={collapsed ? `Expand sidebar to open ${group.title}` : `${isExpanded ? "Collapse" : "Expand"} ${group.title}`}
-                    aria-expanded={!collapsed && isExpanded}
-                    onClick={() => collapsed ? expandSidebar() : setExpanded(isExpanded ? "" : group.title)}
-                  ><Icon name="chevron" /></button>
-                </div>
-                {isExpanded && !collapsed ? (
-                  <div className="nav-submenu">
-                    {group.links.map((link) => (
-                      <NavLink key={link.to} to={link.to} aria-label={link.label} title={collapsed ? link.label : undefined} className={({ isActive }) => isActive ? "active" : ""} onClick={() => closeMobile()}>
-                        <Icon name={link.icon} /><span>{link.label}</span>
-                      </NavLink>
-                    ))}
-                  </div>
-                ) : null}
-              </section>
-            );
-          })}
-          <NavLink to="/settings" aria-label="Settings" title={collapsed ? "Settings" : undefined} className={({ isActive }) => `nav-link${isActive ? " active" : ""}`} onClick={() => closeMobile()}>
-            <Icon name="settings" /><span>Settings</span>
-          </NavLink>
-        </nav>
-        <div className="sidebar-footer">
-          <span className="help-icon" aria-hidden="true">?</span>
-          <span><strong>Need help?</strong><a href="mailto:studentservices@auf.edu.ph">Student Services</a></span>
-        </div>
-      </aside>
-    </>
-  );
-}
-
-function Header({ onMenu, onCollapse, collapsed, mobileOpen, menuButtonRef, onNotifications, navigate, showNotificationDot }) {
   return (
     <header className="topbar">
-      <button ref={menuButtonRef} className="icon-button menu-toggle" type="button" aria-label={mobileOpen ? "Close navigation" : "Open navigation"} aria-expanded={mobileOpen} onClick={onMenu}><Icon name="menu" /></button>
-      <button className="desktop-collapse icon-button" type="button" aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"} aria-expanded={!collapsed} onClick={onCollapse}><Icon name="menu" /></button>
-      <NavLink className="brand" to="/" aria-label="MYAU dashboard">
+      <button id="menu-toggle" ref={menuButtonRef} className="icon-button menu-toggle" type="button" aria-label={menuOpen ? "Close navigation" : "Open navigation"} aria-expanded={menuOpen} aria-controls="sidebar" onClick={onMenuToggle}>
+        <Icon name={menuOpen ? "close" : "menu"} />
+      </button>
+      <Link className="brand" to="/index.html#dashboard" aria-label="MYAU dashboard">
         <span className="brand-mark" aria-hidden="true">AUF</span>
         <span className="brand-copy"><strong>MYAU</strong><span>ANGELES UNIVERSITY FOUNDATION</span></span>
-      </NavLink>
+      </Link>
       <div className="topbar-tools">
-        <span className="portal-label">STUDENT PORTAL · DEMO</span>
-        <button className="icon-button notification-button" type="button" aria-label="View announcements" onClick={onNotifications}><Icon name="bell" />{showNotificationDot ? <span className="notification-dot" aria-hidden="true" /> : null}</button>
+        <span className="portal-label">STUDENT PORTAL</span>
+        <div className="topbar-popover-wrap" ref={notificationRef}>
+          <button className="icon-button notification-button" type="button" aria-label="Notifications" aria-expanded={notificationsOpen} onClick={() => { setNotificationsOpen((value) => !value); setProfileOpen(false); }}>
+            <Icon name="bell" /><span className="notification-dot" aria-hidden="true" />
+          </button>
+          {notificationsOpen && <div className="header-popover notification-popover"><strong>Recent updates</strong>{notices.slice(0, 2).map((notice) => <p key={notice.title}>{notice.title}<small>{notice.time}</small></p>)}</div>}
+        </div>
         <span className="topbar-divider" aria-hidden="true" />
-        <button className="profile-button" type="button" onClick={() => navigate("/profile")} aria-label={`View profile for ${student.name}`}>
-          <span className="avatar avatar-small">AJ</span><span className="profile-name">{student.name}</span><Icon className="chevron" name="chevron" />
-        </button>
+        <div className="topbar-popover-wrap" ref={profileRef}>
+          <button className="profile-button" type="button" aria-label={`Student profile: ${student.name}`} aria-expanded={profileOpen} onClick={() => { setProfileOpen((value) => !value); setNotificationsOpen(false); }}>
+            <span className="avatar avatar-small">AJ</span><span className="profile-name">{student.name}</span><Icon name="chevron" className="chevron" />
+          </button>
+          {profileOpen && <div className="header-popover profile-popover"><strong>{student.id}</strong><Link to="/index.html#view-personal-info" onClick={() => setProfileOpen(false)}>View personal information</Link><span>Demo account</span></div>}
+        </div>
       </div>
     </header>
   );
 }
 
-export default function AppLayout({ children }) {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [collapsed, setCollapsed] = useLocalStorage("myau.sidebarCollapsed", false);
-  const [theme, setTheme] = useLocalStorage("myau.theme", "light");
-  const [preferences, setPreferences] = useLocalStorage("myau.preferences", defaultPreferences);
-  const [showAnnouncements, setShowAnnouncements] = useState(false);
+export default function AppLayout({ activePage, children }) {
+  const [menuOpen, setMenuOpen] = useState(false);
   const menuButtonRef = useRef(null);
+  const active = pages[activePage] ?? pages.dashboard;
 
-  function closeMobile(returnFocus = false) {
-    setMobileOpen(false);
-    if (returnFocus) menuButtonRef.current?.focus();
+  useEffect(() => {
+    document.title = `${active.title} | MYAU`;
+  }, [active.title]);
+
+  useEffect(() => {
+    function handleEscape(event) {
+      if (event.key === "Escape" && menuOpen) {
+        setMenuOpen(false);
+        menuButtonRef.current?.focus();
+      }
+    }
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [menuOpen]);
+
+  function closeMenu() {
+    setMenuOpen(false);
   }
 
-  useEffect(() => {
-    setMobileOpen(false);
-    document.getElementById("main-content")?.focus({ preventScroll: true });
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [location.pathname]);
-
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-    return () => { delete document.documentElement.dataset.theme; };
-  }, [theme]);
-
-  useEffect(() => {
-    if (!mobileOpen) return undefined;
-    document.querySelector(".primary-nav a")?.focus();
-    function dismissOnEscape(event) {
-      if (event.key === "Escape") closeMobile(true);
-    }
-    document.addEventListener("keydown", dismissOnEscape);
-    return () => document.removeEventListener("keydown", dismissOnEscape);
-  }, [mobileOpen]);
-
-  const currentPage = Object.entries(pageInfo).find(([key]) => location.pathname === (key === "dashboard" ? "/" : `/${key}`));
-
   return (
-    <div className={`portal-app${collapsed ? " sidebar-collapsed" : ""}${preferences.compactTables ? " compact-tables" : ""}`}>
+    <>
       <a className="skip-link" href="#main-content">Skip to main content</a>
-      <Header
-        onMenu={() => setMobileOpen((open) => !open)}
-        onCollapse={() => setCollapsed((value) => !value)}
-        collapsed={collapsed}
-        mobileOpen={mobileOpen}
-        menuButtonRef={menuButtonRef}
-        onNotifications={() => setShowAnnouncements(true)}
-        navigate={navigate}
-        showNotificationDot={preferences.announcements}
-      />
+      <Header menuOpen={menuOpen} onMenuToggle={() => setMenuOpen((value) => !value)} menuButtonRef={menuButtonRef} />
       <div className="app-layout">
-        <Sidebar mobileOpen={mobileOpen} collapsed={collapsed} closeMobile={() => closeMobile()} expandSidebar={() => setCollapsed(false)} />
-        <main className="main-content" id="main-content" tabIndex="-1" aria-label={currentPage?.[1].title ?? "Student portal"}>
-          {children ?? <Outlet context={{ theme, setTheme, preferences, setPreferences }} />}
-          <footer className="page-footer"><span>MYAU Student Portal <span className="footer-separator">·</span> Demonstration only</span><span>© {new Date().getFullYear()} Angeles University Foundation</span></footer>
+        {menuOpen && <button className="sidebar-scrim" type="button" aria-label="Close navigation" onClick={closeMenu} />}
+        <aside className={`sidebar${menuOpen ? " is-open" : ""}`} id="sidebar" aria-label="Main navigation">
+          <StudentPanel />
+          <nav className="primary-nav" aria-label="Student portal">
+            <NavLink id="dashboard" label="Dashboard" icon="dashboard" activePage={activePage} onNavigate={closeMenu} />
+            <NavLink id="student-clearance" label="Student Clearance" icon="clearance" activePage={activePage} onNavigate={closeMenu} />
+            {navigationGroups.slice(0, 4).map((group) => <NavigationGroup key={group.id} group={group} activePage={activePage} onNavigate={closeMenu} />)}
+            <NavLink id="discipline-monitoring" label="Discipline Monitoring" icon="shield" activePage={activePage} onNavigate={closeMenu} />
+            <NavigationGroup group={navigationGroups[4]} activePage={activePage} onNavigate={closeMenu} />
+            {standalonePages.map(([id, label, icon]) => <NavLink key={id} id={id} label={label} icon={icon} activePage={activePage} onNavigate={closeMenu} />)}
+          </nav>
+          <div className="sidebar-footer">
+            <span className="help-icon" aria-hidden="true">?</span>
+            <span><strong>Need help?</strong><Link to="/index.html#student-clearance" onClick={closeMenu}>Student Services</Link></span>
+          </div>
+        </aside>
+        <main className="main-content" id="main-content" tabIndex="-1">
+          <div id="page-content" aria-live="polite">{children}</div>
+          <footer className="page-footer"><span>MYAU Student Portal <span className="footer-separator">·</span> Demonstration only</span><span>© 2026 Angeles University Foundation</span></footer>
         </main>
       </div>
-      {showAnnouncements ? (
-        <Modal title="Campus announcements" description="Recent updates for this demo student." onClose={() => setShowAnnouncements(false)}>
-          <div className="announcement-list">
-            {announcements.filter((announcement) => preferences.announcements && (preferences.reminders || announcement.id !== "midterms")).map((announcement) => (
-              <article className="notice-row" key={announcement.id}>
-                <span className={`notice-symbol ${announcement.tone}`}><Icon name="bell" /></span>
-                <div className="notice-copy"><h3 className="notice-title">{announcement.title}</h3><p className="notice-description">{announcement.description}</p></div>
-                <span className="notice-time">{announcement.time}</span>
-              </article>
-            ))}
-            {!preferences.announcements ? <p className="muted-copy">Announcements are hidden in your preferences.</p> : null}
-          </div>
-        </Modal>
-      ) : null}
-    </div>
+    </>
   );
 }
