@@ -34,7 +34,8 @@ export function Badge({ children, tone = "success" }) {
   return <span className={`badge ${toneClass}`}>{children}</span>;
 }
 
-export function DemoNote({ children = "Fictional demonstration data. This page is not connected to official AUF systems." }) {
+export function DemoNote({ children }) {
+  if (!children) return null;
   return <p className="demo-note">{children}</p>;
 }
 

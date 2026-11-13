@@ -35,6 +35,7 @@ function PortalRoute() {
 }
 
 function StandaloneRoute({ pageId }) {
+  if (pageId === "online-payment") return <PortalPage pageId={pageId} />;
   return (
     <AppLayout activePage={pageId}>
       <PortalPage pageId={pageId} />
