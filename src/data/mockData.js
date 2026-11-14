@@ -1,33 +1,33 @@
 export const student = {
-  name: "AGUIRRE, JOBERT...",
+  name: "AGUIRRE, JOBERT HONRA",
   id: "24-1661-908",
-  program: "BSCOE",
+  program: "BSCpE",
   yearLevel: "3RD YEAR",
-  academicYear: "FS, 2026-27",
+  academicYear: "1st Semester, 2026–2027",
 };
 
 export const pages = {
   dashboard: { title: "Dashboard", section: "Overview", description: "Your academic snapshot and the latest campus updates." },
-  "student-clearance": { title: "Student Clearance", section: "Student Services", description: "Review payment clearance and violation clearance in one place." },
+  "student-clearance": { title: "Student Clearance", section: "Student Services", description: "Check account and conduct requirements that may affect clearance." },
   enrollment: { title: "Enrollment", section: "Enrollment", description: "Review your enrolled subjects, fees, and admission requirements." },
-  "subjects-enrolled": { title: "Subjects Enrolled", section: "Enrollment", description: "Your registered subjects for the current academic term." },
+  "subjects-enrolled": { title: "Subjects Enrolled", section: "Enrollment", description: "Your registered subjects for the first semester of 2026–2027." },
   "fees-paid-during-enrollment": { title: "Fees Paid During Enrollment", section: "Enrollment", description: "A record of enrollment fees in this demonstration account." },
-  "submit-admission-requirement": { title: "Submit Admission Requirement", section: "Enrollment", description: "Review and simulate an admission document submission." },
+  "submit-admission-requirement": { title: "Submit Admission Requirements", section: "Enrollment", description: "Review sample admission requirements and simulate a document submission." },
   "student-account": { title: "Student Account", section: "Student Account", description: "Review your student ledger and periodic dues." },
   ledger: { title: "Ledger", section: "Student Account", description: "A summary of charges and credits on your student account." },
   "periodic-dues": { title: "Periodic Dues", section: "Student Account", description: "Your installment schedule and upcoming due dates." },
   "academic-performance": { title: "Academic Performance", section: "Academic Records", description: "Review academic records and progress by category." },
-  "check-list": { title: "Check List", section: "Academic Performance", description: "Review courses, earned units, and grades across your academic terms." },
-  "academic-awards-achievements": { title: "Awards/Achievements", section: "Academic Performance", description: "Academic recognition recorded in the sample profile." },
-  "grading-per-exam-period": { title: "Grading Per Exam Period", section: "Academic Performance", description: "Sample grades by examination period." },
-  "non-acad-performance": { title: "Non-Acad Performance", section: "Student Development", description: "Review membership and non-academic achievements." },
-  membership: { title: "Membership", section: "Non-Acad Performance", description: "Student organizations and co-curricular participation." },
-  "non-acad-awards-achievements": { title: "Awards/Achievements", section: "Non-Acad Performance", description: "Non-academic recognition recorded in the sample profile." },
+  "check-list": { title: "Course Checklist", section: "Academic Performance", description: "Review degree requirements, earned units, and grades by term." },
+  "academic-awards-achievements": { title: "Awards and Achievements", section: "Academic Performance", description: "Academic recognition recorded in the sample profile." },
+  "grading-per-exam-period": { title: "Grades by Exam Period", section: "Academic Performance", description: "Review sample grades for each exam period." },
+  "non-acad-performance": { title: "Non-Academic Performance", section: "Student Development", description: "Review organization membership and non-academic achievements." },
+  membership: { title: "Membership", section: "Non-Academic Performance", description: "Student organizations and co-curricular participation." },
+  "non-acad-awards-achievements": { title: "Awards and Achievements", section: "Non-Academic Performance", description: "Non-academic recognition recorded in the sample profile." },
   "discipline-monitoring": { title: "Discipline Monitoring", section: "Student Services", description: "Review demonstration notices and student conduct resources." },
   "personal-information": { title: "Personal Information", section: "Student Profile", description: "Review and manage your demonstration profile information." },
-  "view-personal-info": { title: "View Personal Info", section: "Personal Information", description: "Fictional profile information for this frontend demonstration." },
+  "view-personal-info": { title: "View Personal Information", section: "Personal Information", description: "Sample profile information for this demonstration." },
   "edit-personal-info": { title: "Edit Personal Information", section: "Personal Information", description: "Update demo contact information saved only in this browser." },
-  "print-personal-info": { title: "Print Personal Info", section: "Personal Information", description: "Print the current personal information view." },
+  "print-personal-info": { title: "Print Personal Information", section: "Personal Information", description: "Print the current profile information." },
   "change-password": { title: "Change Password", section: "Personal Information", description: "Validate a demonstration password without saving it." },
   library: { title: "Library", section: "Library Services", description: "Explore library services and research resources." },
   "ebsco-database": { title: "EBSCO Database", section: "Library Services", description: "Open the external EBSCO research database." },
@@ -43,7 +43,7 @@ export const navigationGroups = [
     children: [
       ["subjects-enrolled", "Subjects Enrolled"],
       ["fees-paid-during-enrollment", "Fees Paid During Enrollment"],
-      ["submit-admission-requirement", "Submit Admission Requirement"],
+      ["submit-admission-requirement", "Submit Admission Requirements"],
     ],
   },
   {
@@ -57,16 +57,16 @@ export const navigationGroups = [
     title: "Academic Performance",
     icon: "award",
     children: [
-      ["check-list", "Check List"],
-      ["academic-awards-achievements", "Awards/Achievements"],
-      ["grading-per-exam-period", "Grading Per Exam Period"],
+      ["check-list", "Course Checklist"],
+      ["academic-awards-achievements", "Awards and Achievements"],
+      ["grading-per-exam-period", "Grades by Exam Period"],
     ],
   },
   {
     id: "non-acad-performance",
-    title: "Non-Acad Performance",
+    title: "Non-Academic Performance",
     icon: "star",
-    children: [["membership", "Membership"], ["non-acad-awards-achievements", "Awards/Achievements"]],
+    children: [["membership", "Membership"], ["non-acad-awards-achievements", "Awards and Achievements"]],
   },
   {
     id: "personal-information",
@@ -88,14 +88,13 @@ export const standalonePages = [
 ];
 
 export const notices = [
-  { icon: "check", tone: "teal", title: "Clearance is in progress", description: "Most offices have cleared your record. Two requirements still need your attention.", time: "Today" },
   { icon: "calendar", tone: "amber", title: "Midterm assessment period", description: "Check your course pages for assessment schedules and instructor announcements.", time: "Oct 27" },
   { icon: "email", tone: "blue", title: "Keep your AUF email active", description: "Official university updates and account notices are sent to your AUF email.", time: "Reminder" },
 ];
 
 export const disciplineStatus = {
-  currentStanding: "Good",
-  activeNotices: [],
+  currentStanding: "Notice on file",
+  activeNotices: [{ title: "No-uniform notice" }],
 };
 
 export const subjects = [
@@ -139,9 +138,9 @@ export const ledgerEntries = [
 ];
 
 export const periodicDues = [
-  ["Prelim", "0.00", "0.00"],
-  ["Midterm", "17,133.34", "17,133.34"],
-  ["Final", "18,566.67", "35,700.00"],
+  ["Prelim", "18,500.00", "18,500.00"],
+  ["Midterm", "18,500.00", "37,000.00"],
+  ["Final", "18,700.00", "55,700.00"],
 ];
 
 export const checkListTerms = [
@@ -205,7 +204,7 @@ export const checkListTerms = [
     courses: [
       { code: "CISCO1", title: "CISCO 1", units: 3, earnedUnits: 3, grade: 93, status: "passed" },
       { code: "CW", title: "The Contemporary World", units: 3, earnedUnits: 3, grade: 96, status: "passed" },
-      { code: "EECIRC", title: "Fundamentals of Electronic Circuits", units: 4, status: "credit-short" },
+      { code: "FECIRC", title: "Fundamentals of Electronic Circuits", units: 4, status: "credit-short" },
       { code: "ETHICS", title: "Ethics", units: 3, earnedUnits: 3, grade: 85, status: "passed" },
       { code: "NUMMET", title: "Numerical Methods", units: 3, earnedUnits: 3, grade: 98, status: "passed" },
       { code: "PEF4", title: "Physical Activity Towards Health and Fitness 4 (PATH-Fit 4)", units: 2, earnedUnits: 2, grade: 97, status: "passed" },
@@ -217,7 +216,7 @@ export const checkListTerms = [
     year: "3rd Year",
     semester: "1st Semester",
     requiredUnits: 25,
-    creditedUnits: 21,
+    creditedUnits: 0,
     courses: [
       { code: "CEDDES", title: "Computer Engineering Drafting and Design", units: 1, status: "enrolled" },
       { code: "CISCO2", title: "CISCO 2", units: 3, status: "enrolled" },
@@ -275,7 +274,7 @@ export const checkListTerms = [
 ];
 
 export const academicSections = [
-  { id: "check-list", title: "Check List", description: pages["check-list"].description },
+  { id: "check-list", title: "Course Checklist", description: pages["check-list"].description },
   { id: "academic-awards-achievements", title: "Awards/Achievements", description: pages["academic-awards-achievements"].description, rows: [["Dean’s List", "2nd Semester · AY 2025–2026"], ["Programming Challenge finalist", "College level · 2025"]] },
   { id: "grading-per-exam-period", title: "Grading Per Exam Period", description: pages["grading-per-exam-period"].description, rows: [["Preliminary", "88.4"], ["Midterm", "90.1"], ["Final", "Pending"]] },
 ];
@@ -286,7 +285,7 @@ export const nonAcademicSections = [
 ];
 
 export const currentBalance = {
-  amount: "₱15,750.00",
+  amount: "₱35,700.00",
   status: "Outstanding",
 };
 
@@ -297,7 +296,7 @@ export const circulationDetails = [
 ];
 
 export const otherPendingClearances = [
-  ["Student Affairs", "Amount: ₱0 · Qty: N/A", "No-uniform notice", "—", "Nov 3, 2026", "Nov 10, 2026"],
+  ["Student Affairs", "₱0 · N/A", "No-uniform notice", "Overdue", "Nov 3, 2026", "Nov 10, 2026"],
 ];
 
 export const profileRows = [

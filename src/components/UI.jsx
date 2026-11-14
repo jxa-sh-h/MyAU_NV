@@ -43,6 +43,20 @@ export function Feedback({ children, tone = "success" }) {
   return children ? <p className={`form-feedback feedback-${tone}`} role="status" aria-live="polite">{children}</p> : null;
 }
 
+function tableCellClass(cell, columnIndex, columnCount) {
+  if (typeof cell !== "string") return columnIndex === columnCount - 1 ? "table-last-cell" : "";
+  const value = cell.trim();
+  const normalized = value.toLocaleLowerCase();
+  const classes = [];
+  if (columnIndex === 0 && /^[A-Z][A-Z0-9-]{2,9}$/.test(value)) classes.push("table-code-cell");
+  if (/^[−-]?\s*(?:₱|php)?\s*\d[\d,]*(?:\.\d{1,2})?$/i.test(value)) classes.push("table-numeric-cell");
+  if (/passed|cleared|received|active member|recorded|good standing/i.test(normalized)) classes.push("table-status-good");
+  else if (/currently enrolled|enrolled|participant/i.test(normalized)) classes.push("table-status-info");
+  else if (/pending|for review|outstanding|overdue|notice on file|in progress|not encoded|no credit|below required/i.test(normalized)) classes.push("table-status-attention");
+  if (columnIndex === columnCount - 1) classes.push("table-last-cell");
+  return classes.join(" ");
+}
+
 export function DataTable({ headers, rows, label, searchable = false, sortable = false }) {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState({ column: -1, direction: "ascending" });
@@ -94,7 +108,7 @@ export function DataTable({ headers, rows, label, searchable = false, sortable =
           <tbody>
             {visibleRows.length > 0 ? visibleRows.map((row, rowIndex) => (
               <tr key={`${label}-${rowIndex}`}>{row.map((cell, cellIndex) => (
-                <td className={cellIndex === row.length - 1 ? "table-last-cell" : ""} key={`${label}-${rowIndex}-${cellIndex}`}>{cell}</td>
+                <td className={tableCellClass(cell, cellIndex, row.length)} key={`${label}-${rowIndex}-${cellIndex}`}>{cell}</td>
               ))}</tr>
             )) : <tr><td colSpan={headers.length}><span className="empty-state">No matching records found.</span></td></tr>}
           </tbody>

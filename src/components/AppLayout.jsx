@@ -76,7 +76,7 @@ export default function AppLayout({ activePage, children }) {
   const active = pages[activePage] ?? pages.dashboard;
 
   useEffect(() => {
-    document.title = `${active.title} | MYAU`;
+    document.title = `${active.title} | MyAU`;
   }, [active.title]);
 
   useEffect(() => {
@@ -103,9 +103,9 @@ export default function AppLayout({ activePage, children }) {
         </button>
         {menuOpen && <button className="sidebar-scrim" type="button" aria-label="Close navigation" onClick={closeMenu} />}
         <aside className={`sidebar${menuOpen ? " is-open" : ""}`} id="sidebar" aria-label="Main navigation">
-          <Link className="sidebar-brand" to="/index.html#dashboard" onClick={closeMenu} aria-label="MYAU Student Portal home">
+          <Link className="sidebar-brand" to="/index.html#dashboard" onClick={closeMenu} aria-label="MyAU Student Portal home">
             <span className="sidebar-brand-mark" aria-hidden="true">AUF</span>
-            <span><strong>MYAU</strong><small>STUDENT PORTAL</small></span>
+            <span><strong>MyAU</strong><small>STUDENT PORTAL</small></span>
           </Link>
           <StudentPanel profile={profile} />
           <nav className="primary-nav" aria-label="Student portal">
@@ -121,7 +121,7 @@ export default function AppLayout({ activePage, children }) {
         </aside>
         <main className="main-content" id="main-content" tabIndex="-1">
           <div id="page-content" aria-live="polite">{children}</div>
-          <footer className="page-footer"><span>MYAU Student Portal <span className="footer-separator">·</span> Demonstration only</span><span>© 2026 Angeles University Foundation</span></footer>
+          <footer className="page-footer"><span>MyAU Student Portal <span className="footer-separator">·</span> Demonstration only</span><span>© 2026 Angeles University Foundation</span></footer>
         </main>
       </div>
     </StudentProfileContext.Provider>

@@ -48,6 +48,7 @@ function Overview({ page, ids }) {
 
 function Dashboard() {
   const today = new Intl.DateTimeFormat("en-PH", { weekday: "long", month: "long", day: "numeric", year: "numeric" }).format(new Date());
+  const enrolledUnits = subjects.reduce((total, [, , , units]) => total + Number(units), 0);
   return (
     <>
       <PageHeading page={{ section: "Student Portal", title: "Welcome back", description: "Here’s your academic snapshot and the latest campus updates." }}>
@@ -62,16 +63,16 @@ function Dashboard() {
         <div className="hero-art" aria-hidden="true"><div className="hero-art-inner"><Icon name="graduation" /></div></div>
       </section>
       <div className="summary-grid">
-        <article className="summary-card"><span className="summary-icon teal"><Icon name="check" /></span><div className="summary-details"><span className="summary-label">Clearance status</span><strong className="summary-value">In progress</strong><span className="summary-meta">2 requirements remaining</span></div></article>
-        <article className="summary-card"><span className="summary-icon blue"><Icon name="book" /></span><div className="summary-details"><span className="summary-label">Enrolled subjects</span><strong className="summary-value">{subjects.length} subjects</strong><span className="summary-meta">21 academic units</span></div></article>
-        <article className="summary-card"><span className="summary-icon amber"><Icon name="wallet" /></span><div className="summary-details"><span className="summary-label">Next periodic due</span><strong className="summary-value">Nov 15</strong><span className="summary-meta">Installment schedule</span></div></article>
+        <article className="summary-card"><span className="summary-icon amber"><Icon name="check" /></span><div className="summary-details"><span className="summary-label">Clearance status</span><strong className="summary-value">Needs attention</strong><span className="summary-meta">Review the outstanding requirements</span></div></article>
+        <article className="summary-card"><span className="summary-icon blue"><Icon name="book" /></span><div className="summary-details"><span className="summary-label">Enrolled subjects</span><strong className="summary-value">{subjects.length} subjects</strong><span className="summary-meta">{enrolledUnits} academic units</span></div></article>
+        <Link className="summary-card" to="/pages/online-payment.html"><span className="summary-icon amber"><Icon name="wallet" /></span><span className="summary-details"><span className="summary-label">Outstanding balance</span><strong className="summary-value">{currentBalance.amount}</strong><span className="summary-meta">View account and payment schedule</span></span></Link>
         <Link className="summary-card" to="/index.html#student-clearance"><span className="summary-icon blue"><Icon name="shield" /></span><span className="summary-details"><span className="summary-label">Discipline standing</span><strong className="summary-value">{disciplineStatus.currentStanding}</strong><span className="summary-meta">{disciplineStatus.activeNotices.length} active notices</span></span></Link>
       </div>
       <section className="dashboard-columns" aria-label="Campus updates and student services">
         <div>
           <div className="section-heading"><h2>Updates for you</h2><Link className="text-link" to="/index.html#student-clearance">View clearance</Link></div>
           <section className="panel" aria-label="Student updates">
-            <div className="panel-header"><div><h2>Important reminders</h2><p>Stay up to date with your academic requirements</p></div><span className="badge badge-warning">2 actions</span></div>
+            <div className="panel-header"><div><h2>Campus updates</h2><p>Announcements and reminders for your studies</p></div><span className="badge badge-neutral">{notices.length} updates</span></div>
             <div className="panel-body">{notices.map((notice) => (
               <article className="notice-row" key={notice.title}>
                 <span className={`notice-symbol ${notice.tone}`}><Icon name={notice.icon} /></span>
@@ -83,7 +84,7 @@ function Dashboard() {
         </div>
         <div className="right-column">
           <section className="service-card"><div className="service-title"><span className="service-icon"><Icon name="email" /></span><h2>Your AUF email</h2></div><p>Use your AUF student email for official university communication, account updates, and announcements.</p><Link className="service-action" to="/index.html#student-clearance">Check student services <Icon name="arrow" /></Link></section>
-          <section className="service-card"><div className="service-title"><span className="service-icon"><Icon name="lms" /></span><h2>MyCLASS &amp; Canvas</h2></div><p>Course materials and class announcements are shared through your assigned learning platform.</p><Link className="service-action" to="/index.html#subjects-enrolled">View my subjects <Icon name="arrow" /></Link></section>
+          <section className="service-card"><div className="service-title"><span className="service-icon"><Icon name="lms" /></span><h2>MyClass (Canvas LMS)</h2></div><p>Find course materials and class announcements in your enrolled courses.</p><Link className="service-action" to="/index.html#subjects-enrolled">View my subjects <Icon name="arrow" /></Link></section>
           <section className="intervention-card"><div className="service-title"><span className="service-icon service-icon-amber"><Icon name="graduation" /></span><h2>Academic support</h2></div><p>Connect with your faculty adviser to learn about academic support and intervention options.</p></section>
         </div>
       </section>
@@ -128,7 +129,7 @@ function ClearancePage() {
         </Panel>
         <Panel title="Other Violation Clearance Items" subtitle="Non-payment requirements that need attention">
           <DataTable
-            headers={["Posted by", "Due", "Requirement", "Remark", "Date posted", "Last date to clear"]}
+            headers={["Posted by", "Amount / quantity", "Requirement", "Status", "Date posted", "Due date"]}
             rows={otherPendingClearances}
             label="Other violation clearance requirements"
           />
@@ -174,15 +175,15 @@ function AdmissionPage() {
   }
 
   const requirementRows = [
-    ["Form 138 / Senior High School Record", <Badge key="received-1">Received</Badge>, "On file"],
-    ["PSA Birth Certificate", <Badge tone="warning" key="review">For review</Badge>, "Review pending"],
-    ["Certificate of Good Moral Character", <Badge key="received-2">Received</Badge>, "On file"],
+    ["Form 138 / Senior High School Record", <Badge key="received-1">Received</Badge>, "No action needed"],
+    ["PSA Birth Certificate", <Badge tone="warning" key="review">For review</Badge>, "Review in progress"],
+    ["Certificate of Good Moral Character", <Badge key="received-2">Received</Badge>, "No action needed"],
   ];
 
   return (
     <>
       <PageIntro page={pages["submit-admission-requirement"]} />
-      <Panel title="Admission requirements"><DataTable headers={["Document", "Status", "Action"]} rows={requirementRows} label="Admission requirement status" /></Panel>
+      <Panel title="Sample admission requirements"><DataTable headers={["Document", "Status", "Next step"]} rows={requirementRows} label="Admission requirement status" /></Panel>
       <section className="panel form-panel">
         <div className="panel-header"><div><h2>Submit a document</h2><p>Choose a file to simulate an admission requirement submission.</p></div></div>
         <form className="demo-form" id="admission-form" onSubmit={submitDocument}>
@@ -382,19 +383,20 @@ function GradingPage() {
   const [endYear, setEndYear] = useState("2027");
   const [showGrades, setShowGrades] = useState(false);
   const { profile } = useStudentProfile();
-  const grades = subjects.map(([code, title, , credit]) => {
+  const hasTermRecords = term === "1st Semester" && startYear === "2026" && endYear === "2027";
+  const grades = hasTermRecords ? subjects.map(([code, title, , credit]) => {
     const record = gradingRecords.find((item) => item.code === code);
-    const grade = examPeriod === "Midterm" ? record.midtermGrade : "Grade not encoded for now";
+    const grade = examPeriod === "Midterm" ? record.midtermGrade : "Not posted";
     return {
       code,
       title,
       credit,
       instructor: record.instructor,
       grade,
-      remarks: examPeriod === "Midterm" ? "Passed" : "Grade not encoded for now",
+      remarks: examPeriod === "Midterm" ? "Passed" : "—",
       isEncoded: examPeriod === "Midterm",
     };
-  });
+  }) : [];
 
   function updateExamPeriod(event) {
     setExamPeriod(event.target.value);
@@ -410,7 +412,7 @@ function GradingPage() {
     <>
       <PageIntro page={pages["grading-per-exam-period"]} />
       <section className="grading-page" aria-label="Grades by exam period">
-        <h2 className="grading-title">Grade Per Exam Period</h2>
+        <h2 className="grading-title">Grades by exam period</h2>
         <dl className="grading-student-details">
           <div><dt>Student ID</dt><dd>{profile.id}</dd></div>
           <div><dt>Student name</dt><dd>{profile.name}</dd></div>
@@ -436,13 +438,13 @@ function GradingPage() {
             <span>to</span>
             <input aria-label="School year end" inputMode="numeric" maxLength="4" value={endYear} onChange={(event) => { setEndYear(event.target.value); setShowGrades(false); }} />
           </div>
-          <button className="grading-view-button" type="submit">Click to View Grade</button>
+          <button className="grading-view-button" type="submit">View grades</button>
         </form>
         {showGrades && (
           <section className="grading-results" aria-live="polite">
-            <p className="grading-note">NOTE: Red color indicates grades not verified by registrar.</p>
-            <h3>{examPeriod} GRADES FOR {startYear}-{endYear}</h3>
-            <div className="grading-table-scroll" role="region" aria-label={`${examPeriod} grades for ${term}, ${startYear}-${endYear}`} tabIndex="0">
+            <p className="grading-note">Red grades are sample values that have not been verified by the registrar. “Not posted” means no grade is shown.</p>
+            <h3>{examPeriod} Grades · {term} · {startYear}–{endYear}</h3>
+            {grades.length === 0 ? <p className="empty-state">No sample grade records are available for {term}, {startYear}–{endYear}.</p> : <div className="grading-table-scroll" role="region" aria-label={`${examPeriod} grades for ${term}, ${startYear}-${endYear}`} tabIndex="0">
               <table className="grading-table">
                 <thead>
                   <tr>
@@ -467,7 +469,7 @@ function GradingPage() {
                   ))}
                 </tbody>
               </table>
-            </div>
+            </div>}
           </section>
         )}
       </section>
@@ -503,6 +505,7 @@ const otherCharges = [
 ];
 
 function FeePaymentDocument() {
+  const printedAt = new Intl.DateTimeFormat("en-PH", { dateStyle: "medium", timeStyle: "short" }).format(new Date());
   return (
     <>
       <div className="document-page-actions">
@@ -511,7 +514,7 @@ function FeePaymentDocument() {
       <article className="fee-payment-document" aria-labelledby="fee-payment-title">
         <header className="fee-document-header">
           <div><h1 id="fee-payment-title">FEE PAYMENT DETAILS</h1><p>1st Semester AY 2026 - 2027</p></div>
-          <time>Date and time printed: 2026-11-13 22:40:28</time>
+          <time>Date and time printed: {printedAt}</time>
         </header>
 
         <section className="fee-student-details" aria-label="Student details">
@@ -534,7 +537,7 @@ function FeePaymentDocument() {
             <dl><div><dt>TUITION FEE</dt><dd>48,056.00</dd></div><div><dt>MISCELLANEOUS FEES</dt><dd>6,848.00</dd></div></dl>
             <h2>OTHER CHARGES</h2>
             <dl>{otherCharges.map(([label, amount]) => <div key={label}><dt>{label}</dt><dd>{amount}</dd></div>)}<div className="fee-subtotal"><dt>TOTAL OTHER CHARGE</dt><dd>17,810.00</dd></div></dl>
-            <dl className="fee-grand-totals"><div><dt>TOTAL ASSESSMENT</dt><dd>Php 72,714.00</dd></div><div><dt>OLD ACCOUNT</dt><dd>Php 0.00</dd></div><div><dt>SCHOLARSHIP/GRANT APPLIED</dt><dd>Php 12,014.00</dd></div><div><dt>TOTAL BALANCE DUE</dt><dd>Php 60,700.00</dd></div></dl>
+            <dl className="fee-grand-totals"><div><dt>TOTAL ASSESSMENT</dt><dd>Php 72,714.00</dd></div><div><dt>OLD ACCOUNT</dt><dd>Php 0.00</dd></div><div><dt>SCHOLARSHIP/GRANT APPLIED</dt><dd>Php 12,014.00</dd></div><div><dt>BALANCE AFTER GRANT AND DOWNPAYMENT</dt><dd>Php 55,700.00</dd></div></dl>
           </div>
           <div className="fee-payment-summary">
             <dl><div><dt>PAYMENT MODE</dt><dd>Installment</dd></div><div><dt>AMOUNT PAID</dt><dd>5,000.00</dd></div><div><dt>DATE PAID</dt><dd>07/16/2026</dd></div><div><dt>PAYMENT TYPE</dt><dd>Cash</dd></div><div><dt>REFERENCE NUMBER</dt><dd>0007900</dd></div></dl>
@@ -620,11 +623,11 @@ function EnrollmentPage({ pageId }) {
   if (pageId === "enrollment") return <Overview page={pages[pageId]} ids={["subjects-enrolled", "fees-paid-during-enrollment", "submit-admission-requirement"]} />;
   if (pageId === "student-account") return <Overview page={pages[pageId]} ids={["ledger", "periodic-dues"]} />;
   if (pageId === "subjects-enrolled") {
-    const rows = subjects.map(([code, title, lecLabUnits, totalUnits]) => [code, title, lecLabUnits, totalUnits, "Assigned faculty · Demo"]);
+    const rows = subjects.map(([code, title, lecLabUnits, totalUnits]) => [code, title, lecLabUnits, totalUnits, gradingRecords.find((record) => record.code === code)?.instructor ?? "To be announced"]);
     return (
       <>
         <PageIntro page={pages[pageId]}><button className="button button-primary print-action" type="button" onClick={() => window.print()}><Icon name="file" /> Print or save as PDF</button></PageIntro>
-        <Panel className="subjects-enrolled-paper" title={`Enrolled ${enrolledTerm.label}`} subtitle={`Official enrollment date: ${enrolledTerm.officialDate}`}>
+        <Panel className="subjects-enrolled-paper" title={`Enrolled ${enrolledTerm.label}`} subtitle={`Enrollment date: ${enrolledTerm.officialDate}`}>
           <div className="term-summary">
             <span>Maximum units this semester <strong>{enrolledTerm.maximumUnits}</strong></span>
             <span>Total units load taken <strong>{enrolledTerm.totalUnits}</strong></span>
@@ -645,7 +648,7 @@ function EnrollmentPage({ pageId }) {
         <span>Term <strong>First Semester, 2026–2027</strong></span>
         <span>Enrollment status <Badge>Enrolled</Badge></span>
       </div>
-      <Panel title="Payment schedule" subtitle="Amounts in PHP">
+      <Panel title="Payment schedule" subtitle="Original installment amounts in PHP; payments and grants are reflected in the current ledger balance.">
         <DataTable headers={["Payment period", "Required amount", "Cumulative balance"]} rows={duesRows} label="Periodic dues schedule" />
       </Panel>
     </>
@@ -654,17 +657,17 @@ function EnrollmentPage({ pageId }) {
 
 function LibraryContent({ pageId }) {
   if (pageId === "library") {
-    return <><PageIntro page={pages[pageId]} /><Panel title="Library services"><p className="panel-copy">Explore research resources and library services for students. Access to licensed research databases may depend on university credentials.</p><Link className="button button-primary" to="/pages/ebsco-database.html">Open EBSCO Database <Icon name="arrow" /></Link></Panel></>;
+    return <><PageIntro page={pages[pageId]} /><Panel title="Research databases"><p className="panel-copy">Access to licensed databases may require your AUF credentials.</p><Link className="button button-primary" to="/pages/ebsco-database.html">Open EBSCO Database <Icon name="arrow" /></Link></Panel></>;
   }
-  return <><PageIntro page={pages[pageId]} /><Panel title="EBSCO research database"><p className="panel-copy">Open the external EBSCO research database to explore journals, articles, and academic resources. Access may require university credentials.</p><a className="button button-primary" href="https://search.ebscohost.com/" target="_blank" rel="noopener noreferrer">Continue to EBSCO <Icon name="arrow" /></a></Panel></>;
+  return <><PageIntro page={pages[pageId]} /><Panel title="EBSCO research database"><p className="panel-copy">You may need to sign in with your AUF credentials to use licensed resources.</p><a className="button button-primary" href="https://search.ebscohost.com/" target="_blank" rel="noopener noreferrer">Continue to EBSCO <Icon name="arrow" /></a></Panel></>;
 }
 
 const evaluationSections = [
   { title: "Instructional Management", questions: [
-    "Our instructor informs us of the session objectives.", "Our instructor discusses the lesson in a systematic and coherent manner.", "Our instructor provides various opportunities for active classroom participation.", "Our instructor asks relevant questions pertaining to the lesson.", "Our instructor responds to our questions and/or comments effectively by clarifying and/or synthesizing.", "Our instructor uses relevant and stimulating materials and resources.", "Our instructor uses real life examples whenever applicable.", "Our instructor connects the current lesson to previous lesson/s and/or other courses.", "Our instructor gives assessment activities that allow us to demonstrate comprehension and application of course content.", "Our instructor gives us a reasonable amount of time to complete a task.", "Our instructor uses English as a medium of instruction.", "Our instructor is able to sustain our attention and interest in the lessons.", "Our instructor always designs learning activities that arouse curiosity.", "Our instructor always designs learning activities that stimulate thinking.", "Our instructor maximizes the use of resources and tools of the instructional modality (online / hybrid / in-person).", "Our instructor implements the module discussions with a variety of materials and strategies (e.g. video, demonstration, lecture, podcast, group work, etc.)", "Our instructor publishes course modules on time.", "Our instructor provides meaningful and constructive feedback within a reasonable period.",
+    "Our instructor informs us of the session objectives.", "Our instructor discusses lessons in a systematic and coherent manner.", "Our instructor provides opportunities for active participation in class.", "Our instructor asks relevant questions about the lesson.", "Our instructor responds to questions and comments by clarifying or summarizing the key points.", "Our instructor uses relevant and engaging materials and resources.", "Our instructor uses real-life examples when appropriate.", "Our instructor connects the current lesson to previous lessons or other courses.", "Our instructor uses assessments that let us demonstrate our understanding and application of course content.", "Our instructor gives us a reasonable amount of time to complete tasks.", "Our instructor uses English as the language of instruction.", "Our instructor sustains our attention and interest in lessons.", "Our instructor designs learning activities that encourage curiosity.", "Our instructor designs learning activities that stimulate critical thinking.", "Our instructor makes effective use of resources and tools for the course format (online, hybrid, or in person).", "Our instructor uses varied materials and strategies in course discussions (for example, videos, demonstrations, lectures, podcasts, and group work).", "Our instructor publishes course modules on time.", "Our instructor provides meaningful, constructive feedback within a reasonable time.",
   ] },
   { title: "Classroom Management", questions: ["Our instructor begins and ends the class on time.", "Our instructor ends the class with the AUF prayer.", "Our instructor ensures that teaching and learning tools are readily available for the class.", "Our instructor effectively addresses disruptive behaviors whenever they arise in our class."] },
-  { title: "Positive Learning Environment", questions: ["Our instructor acknowledges our positive contribution in the learning process.", "Our instructor is available during his/her declared consultation hours.", "Our instructor responds to student messages and queries within office hours in a reasonable period.", "Our instructor provides opportunities for us to make up for missed requirements as long as we have presented valid reasons.", "Our instructor comes up to class well groomed.", "Our instructor shows respect towards students.", "Our instructor is approachable and accommodating."] },
+  { title: "Positive Learning Environment", questions: ["Our instructor acknowledges our positive contributions to learning.", "Our instructor is available during their stated consultation hours.", "Our instructor responds to student messages and questions within a reasonable time during office hours.", "Our instructor allows us to make up missed requirements when we provide a valid reason.", "Our instructor comes to class well-groomed.", "Our instructor treats students with respect.", "Our instructor is approachable and accommodating."] },
 ];
 
 function FacultyEvaluation() {
@@ -675,7 +678,7 @@ function FacultyEvaluation() {
   const evaluationFormRef = useRef(null);
 
   function chooseFaculty(code, title) {
-    setSelectedFaculty({ code, title, faculty: "Faculty member", schedule: feePaymentSubjects.find(([subjectCode]) => subjectCode === code)?.[2] ?? "Assigned schedule" });
+    setSelectedFaculty({ code, title, faculty: gradingRecords.find((record) => record.code === code)?.instructor ?? "Faculty member", schedule: feePaymentSubjects.find(([subjectCode]) => subjectCode === code)?.[2] ?? "Assigned schedule" });
     setFeedback("");
     window.requestAnimationFrame(() => {
       evaluationFormRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -691,7 +694,7 @@ function FacultyEvaluation() {
     setFeedback("");
     window.setTimeout(() => {
       setEvaluations((items) => [...items, { id: Date.now(), course: selectedFaculty.code, faculty: selectedFaculty.faculty, submittedAt: new Date().toLocaleString() }]);
-      setFeedback("Your evaluation has been recorded.");
+    setFeedback("Your evaluation has been saved on this device. It has not been sent to AUF.");
       form.reset();
       setLoading(false);
     }, 400);
@@ -707,13 +710,13 @@ function FacultyEvaluation() {
           {subjects.map(([code, title]) => (
             <article className="faculty-card" key={code}>
               <div className="faculty-photo-placeholder" role="img" aria-label="Faculty photo placeholder"><Icon name="user" /><span>Faculty</span></div>
-              <div className="faculty-card-details"><h3>Faculty member</h3><p className="faculty-subject-code">{code}</p><p className="faculty-subject-title">{title}</p><button className="button button-secondary faculty-evaluate-button" type="button" onClick={() => chooseFaculty(code, title)}>Evaluate this faculty</button></div>
+              <div className="faculty-card-details"><h3>{gradingRecords.find((record) => record.code === code)?.instructor ?? "Faculty member"}</h3><p className="faculty-subject-code">{code}</p><p className="faculty-subject-title">{title}</p><button className="button button-secondary faculty-evaluate-button" type="button" onClick={() => chooseFaculty(code, title)}>Evaluate this faculty</button></div>
             </article>
           ))}
         </div>
       </section>
       <section className="faculty-evaluation-form" ref={evaluationFormRef} aria-labelledby="faculty-evaluation-form-title">
-        <header className="faculty-evaluation-header"><h2 id="faculty-evaluation-form-title">Faculty teaching performance evaluation</h2><p>Rate each statement from 1 (Strongly disagree) to 5 (Strongly agree).</p></header>
+        <header className="faculty-evaluation-header"><h2 id="faculty-evaluation-form-title">Faculty teaching performance evaluation</h2><p>Rate each statement from 1 (Strongly disagree) to 5 (Strongly agree). Demo responses are stored on this device only.</p></header>
         {selectedFaculty ? <>
           <dl className="evaluation-context"><div><dt>Faculty</dt><dd>{selectedFaculty.faculty}</dd></div><div><dt>Subject</dt><dd>{selectedFaculty.code} · {selectedFaculty.title}</dd></div><div><dt>Class schedule</dt><dd>{selectedFaculty.schedule}</dd></div><div><dt>Academic year / semester</dt><dd>2026–2027 · First Semester</dd></div></dl>
           <form className="evaluation-question-form" onSubmit={submitEvaluation}>
@@ -739,7 +742,7 @@ function PaymentPage() {
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState("");
   const paymentTypes = [
-    { id: "installment", label: "Installment fee", description: "Pay your upcoming periodic due.", amount: "₱18,500.00" },
+    { id: "installment", label: "Installment fee", description: "Pay a scheduled installment.", amount: "₱18,500.00" },
     { id: "other-fee", label: "Other school fee", description: "Settle laboratory or service-related fees.", amount: "₱1,919.00" },
     { id: "downpayment", label: "Downpayment", description: "Make an additional payment to your balance.", amount: "₱5,000.00" },
   ];
@@ -749,19 +752,60 @@ function PaymentPage() {
     setLoading(true);
     setFeedback("");
     window.setTimeout(() => {
-      setFeedback(`${selectedPayment.label} payment preview is ready using ${paymentMethod === "card" ? "card" : paymentMethod === "wallet" ? "e-wallet" : "online banking"}.`);
+      setFeedback(`Demo preview ready for ${selectedPayment.label} using ${paymentMethod === "card" ? "card" : paymentMethod === "wallet" ? "e-wallet" : "online banking"}. No payment was processed.`);
       setLoading(false);
     }, 450);
   }
 
   return (
     <main className="payment-standalone" aria-label="Online payment">
-      <header className="payment-standalone-header"><Link className="payment-brand" to="/index.html#dashboard"><span>AUF</span><strong>MYAU Pay</strong></Link><Link className="payment-return" to="/index.html#dashboard">Back to portal <Icon name="arrow" /></Link></header>
+      <header className="payment-standalone-header">
+        <Link className="payment-brand" to="/index.html#dashboard"><span>AUF</span><strong>MyAU Pay</strong></Link>
+        <Link className="payment-return" to="/index.html#dashboard">Back to portal <Icon name="arrow" /></Link>
+      </header>
       <div className="payment-standalone-content">
-        <section className="payment-summary-card" aria-labelledby="payment-summary-title"><div><p className="payment-eyebrow">Student account</p><h1 id="payment-summary-title">Payment summary</h1><p className="payment-student-name">{profile.name} <span>· {profile.id}</span></p></div><div className="payment-balance-overview"><span>Outstanding balance</span><strong>{currentBalance.amount}</strong><small>First Semester, 2026–2027</small></div></section>
-        <section className="payment-checkout" aria-labelledby="make-payment-title"><div className="payment-checkout-main"><h2 id="make-payment-title">Make a payment</h2><p>Choose what you would like to pay, then select a payment method.</p><div className="payment-type-options" role="radiogroup" aria-label="Payment type">{paymentTypes.map((option) => <label className={`payment-type-option${paymentType === option.id ? " selected" : ""}`} key={option.id}><input type="radio" name="payment-type" value={option.id} checked={paymentType === option.id} onChange={() => { setPaymentType(option.id); setFeedback(""); }} /><span><strong>{option.label}</strong><small>{option.description}</small></span><b>{option.amount}</b></label>)}</div><h3>Payment method</h3><div className="payment-method-options" role="radiogroup" aria-label="Payment method">{[["card", "Card", "Debit or credit card"], ["wallet", "E-wallet", "GCash or Maya"], ["bank", "Online banking", "Bank transfer"]].map(([id, label, detail]) => <label className={paymentMethod === id ? "selected" : ""} key={id}><input type="radio" name="payment-method" value={id} checked={paymentMethod === id} onChange={() => setPaymentMethod(id)} /><span><strong>{label}</strong><small>{detail}</small></span></label>)}</div></div><aside className="payment-order-summary"><h2>Payment details</h2><dl><div><dt>Payment for</dt><dd>{selectedPayment.label}</dd></div><div><dt>Student</dt><dd>{profile.id}</dd></div><div><dt>Amount</dt><dd>{selectedPayment.amount}</dd></div></dl><button className="button button-primary" type="button" onClick={previewPayment} disabled={loading}>{loading ? <><span className="loading-spinner" />Preparing…</> : `Continue with ${selectedPayment.amount}`}</button><Feedback>{feedback}</Feedback></aside></section>
-        <section className="payment-help" aria-labelledby="payment-help-title"><div><p className="payment-eyebrow">Help</p><h2 id="payment-help-title">Payment instructions</h2><p>Review the payment process before you continue.</p><div className="payment-help-actions"><a className="button button-secondary" href="/payment_instruction.pdf" target="_blank" rel="noreferrer">Open PDF <Icon name="external" /></a><a className="text-link" href="/payment_instruction.pdf" download>Download PDF</a></div></div><iframe src="/payment_instruction.pdf#view=FitH" title="Payment instructions PDF" /></section>
-        <section className="payment-account-details" aria-labelledby="payment-account-details-title"><div className="payment-section-heading"><div><p className="payment-eyebrow">Account details</p><h2 id="payment-account-details-title">Charges and payment activity</h2></div><span>Current term</span></div><div className="payment-tables"><section><h3>Current charges</h3><table><thead><tr><th>Item</th><th>Amount</th></tr></thead><tbody><tr><td>Tuition and school fees</td><td>₱72,714.00</td></tr><tr><td>Scholarship / grant</td><td>− ₱12,014.00</td></tr><tr><td>Payments received</td><td>− ₱25,000.00</td></tr></tbody><tfoot><tr><th>Outstanding balance</th><th>{currentBalance.amount}</th></tr></tfoot></table></section><section><h3>Installment schedule</h3><table><thead><tr><th>Due period</th><th>Amount</th></tr></thead><tbody><tr><td>Prelim</td><td>₱18,500.00</td></tr><tr><td>Midterm</td><td>₱18,500.00</td></tr><tr><td>Final</td><td>₱18,700.00</td></tr></tbody></table></section><section><h3>Recent payments</h3><table><thead><tr><th>Date</th><th>Amount</th></tr></thead><tbody><tr><td>Nov 09, 2026</td><td>₱10,000.00</td></tr><tr><td>Nov 03, 2026</td><td>₱10,000.00</td></tr><tr><td>Aug 28, 2026</td><td>₱12,014.00</td></tr></tbody></table></section></div></section>
+        <section className="payment-summary-card" aria-labelledby="payment-summary-title">
+          <div><p className="payment-eyebrow">Student account</p><h1 id="payment-summary-title">Payment summary</h1><p className="payment-student-name">{profile.name} <span>· {profile.id}</span></p></div>
+          <div className="payment-balance-overview"><span>Outstanding balance</span><strong>{currentBalance.amount}</strong><small>First Semester, 2026–2027</small></div>
+        </section>
+        <section className="payment-checkout" aria-labelledby="make-payment-title">
+          <div className="payment-checkout-main">
+            <h2 id="make-payment-title">Make a payment</h2>
+            <p>Choose what you would like to pay, then select a payment method.</p>
+            <p className="payment-demo-note">Demonstration only. No payment is processed.</p>
+            <div className="payment-type-options" role="radiogroup" aria-label="Payment type">
+              {paymentTypes.map((option) => <label className={`payment-type-option${paymentType === option.id ? " selected" : ""}`} key={option.id}>
+                <input type="radio" name="payment-type" value={option.id} checked={paymentType === option.id} onChange={() => { setPaymentType(option.id); setFeedback(""); }} />
+                <span><strong>{option.label}</strong><small>{option.description}</small></span><b>{option.amount}</b>
+              </label>)}
+            </div>
+            <h3>Payment method</h3>
+            <div className="payment-method-options" role="radiogroup" aria-label="Payment method">
+              {[['card', 'Card', 'Debit or credit card'], ['wallet', 'E-wallet', 'GCash or Maya'], ['bank', 'Online banking', 'Bank transfer']].map(([id, label, detail]) => <label className={paymentMethod === id ? "selected" : ""} key={id}>
+                <input type="radio" name="payment-method" value={id} checked={paymentMethod === id} onChange={() => setPaymentMethod(id)} />
+                <span><strong>{label}</strong><small>{detail}</small></span>
+              </label>)}
+            </div>
+          </div>
+          <aside className="payment-order-summary">
+            <h2>Payment details</h2>
+            <dl><div><dt>Payment for</dt><dd>{selectedPayment.label}</dd></div><div><dt>Amount</dt><dd>{selectedPayment.amount}</dd></div></dl>
+            <button className="button button-primary" type="button" onClick={previewPayment} disabled={loading}>{loading ? <><span className="loading-spinner" />Preparing…</> : "Preview payment"}</button>
+            <Feedback>{feedback}</Feedback>
+          </aside>
+        </section>
+        <section className="payment-help" aria-labelledby="payment-help-title">
+          <div><p className="payment-eyebrow">Help</p><h2 id="payment-help-title">Payment instructions</h2><p>Review the payment process before you continue.</p><div className="payment-help-actions"><a className="button button-secondary" href="/payment_instruction.pdf" target="_blank" rel="noreferrer">Open PDF <Icon name="external" /></a><a className="text-link" href="/payment_instruction.pdf" download>Download PDF</a></div></div>
+          <iframe src="/payment_instruction.pdf#view=FitH" title="Payment instructions PDF" />
+        </section>
+        <section className="payment-account-details" aria-labelledby="payment-account-details-title">
+          <div className="payment-section-heading"><div><p className="payment-eyebrow">Account details</p><h2 id="payment-account-details-title">Charges and payment activity</h2></div><span>Current term</span></div>
+          <div className="payment-tables">
+            <section><h3>Current charges</h3><table><thead><tr><th>Item</th><th>Amount</th></tr></thead><tbody><tr><td>Tuition and school fees</td><td>₱72,714.00</td></tr><tr><td>Scholarship / grant</td><td>− ₱12,014.00</td></tr><tr><td>Payments received</td><td>− ₱25,000.00</td></tr></tbody></table></section>
+            <section><h3>Installment schedule</h3><p className="payment-table-note">Original schedule. Grants and payments applied to date are reflected in the outstanding balance.</p><table><thead><tr><th>Due period</th><th>Amount</th></tr></thead><tbody><tr><td>Prelim</td><td>₱18,500.00</td></tr><tr><td>Midterm</td><td>₱18,500.00</td></tr><tr><td>Final</td><td>₱18,700.00</td></tr></tbody></table></section>
+            <section><h3>Recent payments</h3><table><thead><tr><th>Date</th><th>Amount</th></tr></thead><tbody><tr><td>Nov 09, 2026</td><td>₱10,000.00</td></tr><tr><td>Nov 03, 2026</td><td>₱10,000.00</td></tr><tr><td>Jul 16, 2026</td><td>₱5,000.00</td></tr></tbody></table></section>
+          </div>
+        </section>
       </div>
     </main>
   );

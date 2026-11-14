@@ -29,7 +29,7 @@ export default function LoginPage() {
           <div className="login-card-heading">
             <span className="login-card-eyebrow">Welcome to MyAU</span>
             <h2 id="login-card-title">Sign in to continue</h2>
-            <p>Students, parents, and new students</p>
+            <p>For students and parents</p>
           </div>
           <form className="login-form" onSubmit={signIn}>
             <label htmlFor="login-username">Username</label>
