@@ -108,7 +108,7 @@ export function DataTable({ headers, rows, label, searchable = false, sortable =
           <tbody>
             {visibleRows.length > 0 ? visibleRows.map((row, rowIndex) => (
               <tr key={`${label}-${rowIndex}`}>{row.map((cell, cellIndex) => (
-                <td className={tableCellClass(cell, cellIndex, row.length)} key={`${label}-${rowIndex}-${cellIndex}`}>{cell}</td>
+                <td className={tableCellClass(cell, cellIndex, row.length)} data-label={headers[cellIndex]} key={`${label}-${rowIndex}-${cellIndex}`}>{cell}</td>
               ))}</tr>
             )) : <tr><td colSpan={headers.length}><span className="empty-state">No matching records found.</span></td></tr>}
           </tbody>

@@ -621,7 +621,7 @@ function FeePaymentDocument() {
           <h2 id="fee-subjects-title" className="visually-hidden">Enrolled subjects</h2>
           <table>
             <thead><tr><th>Subject code</th><th>Subject title</th><th>Schedule</th><th>Section/Room #</th><th>Units taken</th></tr></thead>
-            <tbody>{documentSubjects.map(([code, title, schedule, room, units]) => <tr key={code}><td>{code}</td><td>{title}</td><td>{schedule}</td><td>{room}</td><td>{units}</td></tr>)}</tbody>
+            <tbody>{documentSubjects.map(([code, title, schedule, room, units]) => <tr key={code}><td data-label="Subject code">{code}</td><td data-label="Subject title">{title}</td><td data-label="Schedule">{schedule}</td><td data-label="Section/Room #">{room}</td><td data-label="Units taken">{units}</td></tr>)}</tbody>
           </table>
           <p className="fee-total-units">TOTAL LOAD UNITS: <strong>{totalUnits}</strong></p>
         </section>
