@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { navigationGroups, pages, standalonePages, student } from "../data/mockData.js";
+import { navigationGroups, pages, standalonePages, student, subjects } from "../data/mockData.js";
 import { useLocalStorage } from "../hooks/useLocalStorage.js";
 import { StudentProfileContext } from "../contexts/StudentProfileContext.jsx";
 import { demoAccounts } from "../data/demoAccounts.js";
@@ -74,7 +74,9 @@ export default function AppLayout({ activePage, children }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [session, setSession] = useLocalStorage("myau-demo-session", null);
   const account = demoAccounts.find((item) => item.username === session?.username) ?? demoAccounts[0];
-  const [profile, setProfile] = useLocalStorage(`myau-personal-info-${account.username}`, account.profile ?? { ...student, email: "", contactMobile: "" });
+  const profileStorageKey = account.username === "AUFAGUIRRE15" ? "myau-personal-info-AUFAGUIRRE15-v2" : "myau-personal-info-MYAUDEMO-v2";
+  const [profile, setProfile] = useLocalStorage(profileStorageKey, account.profile ?? { ...student, email: "", contactMobile: "" });
+  const activeSubjects = account.subjects ?? subjects;
   const menuButtonRef = useRef(null);
   const active = pages[activePage] ?? pages.dashboard;
 
@@ -103,7 +105,7 @@ export default function AppLayout({ activePage, children }) {
   }
 
   return (
-    <StudentProfileContext.Provider value={{ profile, setProfile }}>
+    <StudentProfileContext.Provider value={{ profile, setProfile, subjects: activeSubjects, data: account.data ?? {} }}>
       <a className="skip-link" href="#main-content">Skip to main content</a>
       <div className="app-layout">
         <button id="menu-toggle" ref={menuButtonRef} className="icon-button menu-toggle" type="button" aria-label={menuOpen ? "Close navigation" : "Open navigation"} aria-expanded={menuOpen} aria-controls="sidebar" onClick={() => setMenuOpen((value) => !value)}>

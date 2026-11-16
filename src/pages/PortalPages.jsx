@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   academicSections,
@@ -37,6 +37,24 @@ function Note({ children }) {
   return <DemoNote>{children}</DemoNote>;
 }
 
+function usePortalData() {
+  const { profile, subjects: activeSubjects, data = {} } = useStudentProfile();
+  return {
+    profile,
+    subjects: activeSubjects ?? subjects,
+    currentBalance: data.currentBalance ?? currentBalance,
+    notices: data.notices ?? notices,
+    circulationDetails: data.circulationDetails ?? circulationDetails,
+    disciplineStatus: data.disciplineStatus ?? disciplineStatus,
+    otherPendingClearances: data.otherPendingClearances ?? otherPendingClearances,
+    gradingRecords: data.gradingRecords ?? gradingRecords,
+    enrolledTerm: data.enrolledTerm ?? enrolledTerm,
+    ledgerEntries: data.ledgerEntries ?? ledgerEntries,
+    periodicDues: data.periodicDues ?? periodicDues,
+    fee: data.fee,
+  };
+}
+
 function Overview({ page, ids }) {
   return (
     <>
@@ -48,11 +66,31 @@ function Overview({ page, ids }) {
 }
 
 function Dashboard() {
+  const { profile, currentBalance: activeBalance, notices: activeNotices, circulationDetails: activeCirculation, disciplineStatus: activeDiscipline, otherPendingClearances: activeClearances } = usePortalData();
   const today = new Intl.DateTimeFormat("en-PH", { weekday: "long", month: "long", day: "numeric", year: "numeric" }).format(new Date());
-  const hasPendingClearance = currentBalance.status === "Outstanding"
-    || disciplineStatus.activeNotices.length > 0
-    || otherPendingClearances.length > 0
-    || circulationDetails.some(([item, value]) => /overdue|fine/i.test(item) && !/^₱?0(?:\.00)?$/.test(value.trim()));
+  const hasPendingClearance = activeBalance.status === "Outstanding"
+    || activeDiscipline.activeNotices.length > 0
+    || activeClearances.length > 0
+    || activeCirculation.some(([item, value]) => /overdue|fine/i.test(item) && !/^₱?0(?:\.00)?$/.test(value.trim()));
+  const mascotMessages = [
+    { image: "msacot_greetings.png", alt: "The AUF dog mascot greeting students", kicker: "Your AUF companion", title: "Welcome back, Angelenean!", message: "Ready to check your classes, campus updates, and next steps?", action: "View my enrollment", to: "/index.html#subjects-enrolled" },
+    { image: "mascot_happy.png", alt: "The AUF dog mascot smiling brightly", kicker: "Keep up the good work", title: "You’re making progress!", message: "Your steady effort adds up. Take the semester one task at a time.", action: "View my enrollment", to: "/index.html#subjects-enrolled" },
+    { image: "mascot_standing.png", alt: "The AUF dog mascot standing at attention", kicker: "Ready for your next step?", title: "Check your academic progress.", message: "Review your records and ask your faculty adviser about support when you need it.", action: "Academic records", to: "/index.html#academic-performance" },
+    { image: "mascot_resting.png", alt: "The AUF dog mascot taking a nap", kicker: "A gentle reminder", title: "Take a breather.", message: "A short rest can help you return to your next task with fresh focus.", action: "View my enrollment", to: "/index.html#subjects-enrolled" },
+    { image: "mascot_wink.png", alt: "The AUF dog mascot winking", kicker: "You’ve got this", title: "One step at a time.", message: "Need to share feedback about a class? The evaluation form is ready when you are.", action: "Evaluate a class", to: "/pages/faculty-evaluation.html" },
+    hasPendingClearance
+      ? { image: "mscot_notice.png", alt: "The AUF dog mascot showing a reminder", kicker: "Clearance reminder", title: "There are items to review.", message: "Open Student Clearance to check your pending payment, library, or conduct requirements.", action: "Open clearance", to: "/index.html#student-clearance" }
+      : { image: "mascot_happy.png", alt: "The AUF dog mascot smiling", kicker: "Clearance update", title: "You’re all clear!", message: "There are no pending clearance items in your account.", action: "View my enrollment", to: "/index.html#subjects-enrolled" },
+  ];
+  const [mascotIndex, setMascotIndex] = useState(0);
+  const mascot = mascotMessages[mascotIndex];
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
+    const timer = window.setInterval(() => {
+      setMascotIndex((index) => (index + 1) % mascotMessages.length);
+    }, 7000);
+    return () => window.clearInterval(timer);
+  }, [mascotMessages.length]);
   const clearanceCard = hasPendingClearance ? (
     <Link className="summary-card" to="/index.html#student-clearance">
       <span className="summary-icon amber"><Icon name="check" /></span>
@@ -71,24 +109,26 @@ function Dashboard() {
       </PageHeading>
       <section className="hero" aria-labelledby="hero-title">
         <div className="hero-content">
-          <p className="hero-kicker">Your semester, in focus</p><h2 id="hero-title">Make this semester count.</h2>
-          <p>Keep track of your classes, requirements, and campus updates—all in one place.</p>
-          <Link className="button button-light" to="/index.html#subjects-enrolled">View my enrollment <Icon name="arrow" /></Link>
+          <p className="hero-kicker">{mascot.kicker}</p><h2 id="hero-title">{mascot.title}</h2>
+          <p id="mascot-message" aria-live="off">{mascot.message}</p>
+          <Link className="button button-light" to={mascot.to}>{mascot.action} <Icon name="arrow" /></Link>
         </div>
-        <div className="hero-art" aria-hidden="true"><div className="hero-art-inner"><Icon name="graduation" /></div></div>
+        <div className="hero-art mascot-art" aria-hidden="true">
+          <img className="mascot-image" key={`${mascot.image}-${mascot.title}`} src={`/img/mascot/${mascot.image}`} alt="" />
+        </div>
       </section>
       <div className="summary-grid">
         {clearanceCard}
         <article className="summary-card"><span className="summary-icon blue"><Icon name="graduation" /></span><span className="summary-details"><span className="summary-label">Academic interventions</span><strong className="summary-value">Talk to an adviser</strong><span className="summary-meta">Ask about academic support options</span></span></article>
-        <Link className="summary-card" to="/pages/online-payment.html"><span className="summary-icon amber"><Icon name="wallet" /></span><span className="summary-details"><span className="summary-label">Account balance</span><strong className="summary-value">{currentBalance.status}</strong><span className="summary-meta">View payment details</span></span></Link>
+        <Link className="summary-card" to="/pages/online-payment.html"><span className="summary-icon amber"><Icon name="wallet" /></span><span className="summary-details"><span className="summary-label">Account balance</span><strong className="summary-value">{activeBalance.status}</strong><span className="summary-meta">View payment details</span></span></Link>
         <Link className="summary-card" to="/pages/faculty-evaluation.html"><span className="summary-icon blue"><Icon name="star" /></span><span className="summary-details"><span className="summary-label">Faculty evaluation</span><strong className="summary-value">Open evaluation</strong><span className="summary-meta">Share feedback on your classes</span></span></Link>
       </div>
       <section className="dashboard-columns" aria-label="Campus updates and student services">
         <div>
           <div className="section-heading"><h2>Updates for you</h2><Link className="text-link" to="/index.html#student-clearance">View clearance</Link></div>
           <section className="panel" aria-label="Student updates">
-            <div className="panel-header"><div><h2>Campus updates</h2><p>Announcements and reminders for your studies</p></div><span className="badge badge-neutral">{notices.length} updates</span></div>
-            <div className="panel-body">{notices.map((notice) => (
+            <div className="panel-header"><div><h2>Campus updates</h2><p>Announcements and reminders for your studies</p></div><span className="badge badge-neutral">{activeNotices.length} updates</span></div>
+            <div className="panel-body">{activeNotices.map((notice) => (
               <article className="notice-row" key={notice.title}>
                 <span className={`notice-symbol ${notice.tone}`}><Icon name={notice.icon} /></span>
                 <div className="notice-copy"><h3 className="notice-title">{notice.title}</h3><p className="notice-description">{notice.description}</p></div>
@@ -100,7 +140,7 @@ function Dashboard() {
         <div className="right-column">
           <section className="service-card dashboard-account-card">
             <div className="service-title"><img className="dashboard-brand-logo" src="/img/gmail_logo.png" alt="" aria-hidden="true" /><h2>MyAU Mail</h2></div>
-            <a className="service-account-link" href="https://mail.auf.edu.ph/" target="_blank" rel="noopener noreferrer">aguirre.jobert@student.auf.edu.ph <Icon name="external" /></a>
+            <a className="service-account-link" href="https://mail.auf.edu.ph/" target="_blank" rel="noopener noreferrer">{profile.email} <Icon name="external" /></a>
             <details className="dashboard-help-details">
               <summary>Setup and support</summary>
               <div className="dashboard-help-copy">
@@ -133,10 +173,11 @@ function Dashboard() {
 }
 
 function ClearancePage() {
-  const { amount, status } = currentBalance;
-  const circulationRows = circulationDetails.map(([detail, value]) => [detail, value]);
-  const activeNotices = disciplineStatus.activeNotices.length
-    ? disciplineStatus.activeNotices.map(({ title }) => title).join(", ")
+  const { currentBalance: activeBalance, circulationDetails: activeCirculation, disciplineStatus: activeDiscipline, otherPendingClearances: activeClearances } = usePortalData();
+  const { amount, status } = activeBalance;
+  const circulationRows = activeCirculation.map(([detail, value]) => [detail, value]);
+  const activeNotices = activeDiscipline.activeNotices.length
+    ? activeDiscipline.activeNotices.map(({ title }) => title).join(", ")
     : "None";
   return (
     <>
@@ -160,7 +201,7 @@ function ClearancePage() {
           <DataTable
             headers={["Item", "Details"]}
             rows={[
-              ["Current standing", disciplineStatus.currentStanding],
+              ["Current standing", activeDiscipline.currentStanding],
               ["Active violation notices", activeNotices],
             ]}
             label="Violation clearance and discipline status"
@@ -169,7 +210,7 @@ function ClearancePage() {
         <Panel title="Other Violation Clearance Items" subtitle="Non-payment requirements that need attention">
           <DataTable
             headers={["Posted by", "Amount / quantity", "Requirement", "Status", "Date posted", "Due date"]}
-            rows={otherPendingClearances}
+            rows={activeClearances}
             label="Other violation clearance requirements"
           />
         </Panel>
@@ -194,7 +235,8 @@ function SimpleDataPage({ page, title, headers, rows, label, subtitle, searchabl
 }
 
 function AdmissionPage() {
-  const [submitted, setSubmitted] = useLocalStorage("myau-admission-documents", []);
+  const { profile } = usePortalData();
+  const [submitted, setSubmitted] = useLocalStorage(`myau-admission-documents-${profile.id}`, []);
   const [feedback, setFeedback] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -343,7 +385,14 @@ function PersonalContent({ pageId }) {
 }
 
 function CheckListPage() {
-  const rowCount = Math.max(...checkListTerms.map(({ courses }) => courses.length));
+  const { profile, subjects: activeSubjects } = usePortalData();
+  const activeCheckListTerms = profile.program === "BSCE"
+    ? [
+      { year: "1st Year", semester: "2nd Semester", requiredUnits: 24, creditedUnits: 24, courses: activeSubjects.slice(0, 4).map(([code, title, , units], index) => ({ code, title, units: Number(units), earnedUnits: Number(units), grade: 88 + index, status: "passed" })) },
+      { year: "2nd Year", semester: "1st Semester", requiredUnits: 24, creditedUnits: 24, courses: activeSubjects.slice(4).map(([code, title, , units], index) => ({ code, title, units: Number(units), earnedUnits: Number(units), grade: 90 + index, status: "passed" })) },
+    ]
+    : checkListTerms;
+  const rowCount = Math.max(...activeCheckListTerms.map(({ courses }) => courses.length));
   const statusLabels = {
     passed: "Passed",
     "credit-short": "Credit below required units",
@@ -368,12 +417,12 @@ function CheckListPage() {
             <thead>
               <tr>
                 <th className="checklist-number-heading" scope="col" rowSpan="2">#</th>
-                {checkListTerms.filter((_, index) => index % 2 === 0).map(({ year }) => (
+                {activeCheckListTerms.filter((_, index) => index % 2 === 0).map(({ year }) => (
                   <th className="checklist-year-heading" scope="colgroup" colSpan="2" key={year}>{year}</th>
                 ))}
               </tr>
               <tr>
-                {checkListTerms.map((term, index) => (
+                {activeCheckListTerms.map((term, index) => (
                   <th className="checklist-term-heading" id={`checklist-term-${index + 1}`} scope="col" key={`${term.year}-${term.semester}`}>
                     <strong>{term.semester}</strong>
                     <span>Required {term.requiredUnits} · Credited {term.creditedUnits}</span>
@@ -385,7 +434,7 @@ function CheckListPage() {
               {Array.from({ length: rowCount }, (_, rowIndex) => (
                 <tr key={rowIndex}>
                   <th className="checklist-row-number" scope="row">{rowIndex + 1}</th>
-                  {checkListTerms.map((term, termIndex) => {
+                  {activeCheckListTerms.map((term, termIndex) => {
                     const course = term.courses[rowIndex];
                     if (!course) return <td className="checklist-empty-cell" key={`${termIndex}-${rowIndex}`} aria-hidden="true" />;
                     return (
@@ -421,16 +470,16 @@ function GradingPage() {
   const [startYear, setStartYear] = useState("2026");
   const [endYear, setEndYear] = useState("2027");
   const [showGrades, setShowGrades] = useState(false);
-  const { profile } = useStudentProfile();
+  const { profile, subjects: activeSubjects, gradingRecords: activeGrades } = usePortalData();
   const hasTermRecords = term === "1st Semester" && startYear === "2026" && endYear === "2027";
-  const grades = hasTermRecords ? subjects.map(([code, title, , credit]) => {
-    const record = gradingRecords.find((item) => item.code === code);
-    const grade = examPeriod === "Midterm" ? record.midtermGrade : "Not posted";
+  const grades = hasTermRecords ? activeSubjects.map(([code, title, , credit]) => {
+    const record = activeGrades.find((item) => item.code === code);
+    const grade = examPeriod === "Midterm" ? record?.midtermGrade ?? "Not posted" : "Not posted";
     return {
       code,
       title,
       credit,
-      instructor: record.instructor,
+      instructor: record?.instructor ?? "Faculty member",
       grade,
       remarks: examPeriod === "Midterm" ? "Passed" : "—",
       isEncoded: examPeriod === "Midterm",
@@ -544,6 +593,12 @@ const otherCharges = [
 ];
 
 function FeePaymentDocument() {
+  const { profile, subjects: activeSubjects, fee } = usePortalData();
+  const documentSubjects = profile.program === "BSCE"
+    ? activeSubjects.map(([code, title, , units], index) => [code, title.toUpperCase(), ["M 8:00AM–11:00AM", "T 1:00PM–4:00PM", "W 8:00AM–11:00AM", "TH 1:00PM–4:00PM"][index % 4], `BSCE 2-A/CE-${201 + index}`, units])
+    : feePaymentSubjects;
+  const totalUnits = documentSubjects.reduce((sum, [, , , , units]) => sum + Number(units), 0).toFixed(1);
+  const feeData = fee ?? { tuition: "48,056.00", miscellaneous: "6,848.00", otherCharges: "17,810.00", assessment: "72,714.00", grant: "12,014.00", paid: "5,000.00", balance: "55,700.00" };
   const printedAt = new Intl.DateTimeFormat("en-PH", { dateStyle: "medium", timeStyle: "short" }).format(new Date());
   return (
     <>
@@ -557,8 +612,8 @@ function FeePaymentDocument() {
         </header>
 
         <section className="fee-student-details" aria-label="Student details">
-          <dl><div><dt>Student ID</dt><dd>24-1661-908</dd></div><div><dt>Student Name</dt><dd>AGUIRRE, JOBERT HONRA</dd></div><div><dt>Student type</dt><dd>Old / Regular</dd></div></dl>
-          <dl><div><dt>Course/Major</dt><dd>Bachelor of Science in Computer Engineering</dd></div><div><dt>Year Level</dt><dd>3</dd></div></dl>
+          <dl><div><dt>Student ID</dt><dd>{profile.id}</dd></div><div><dt>Student Name</dt><dd>{profile.name}</dd></div><div><dt>Student type</dt><dd>Old / Regular</dd></div></dl>
+          <dl><div><dt>Course/Major</dt><dd>{profile.program === "BSCE" ? "Bachelor of Science in Civil Engineering" : "Bachelor of Science in Computer Engineering"}</dd></div><div><dt>Year Level</dt><dd>{profile.yearLevel}</dd></div></dl>
           <dl><div><dt>Gender</dt><dd>Male</dd></div></dl>
         </section>
 
@@ -566,21 +621,21 @@ function FeePaymentDocument() {
           <h2 id="fee-subjects-title" className="visually-hidden">Enrolled subjects</h2>
           <table>
             <thead><tr><th>Subject code</th><th>Subject title</th><th>Schedule</th><th>Section/Room #</th><th>Units taken</th></tr></thead>
-            <tbody>{feePaymentSubjects.map(([code, title, schedule, room, units]) => <tr key={code}><td>{code}</td><td>{title}</td><td>{schedule}</td><td>{room}</td><td>{units}</td></tr>)}</tbody>
+            <tbody>{documentSubjects.map(([code, title, schedule, room, units]) => <tr key={code}><td>{code}</td><td>{title}</td><td>{schedule}</td><td>{room}</td><td>{units}</td></tr>)}</tbody>
           </table>
-          <p className="fee-total-units">TOTAL LOAD UNITS: <strong>22.0</strong></p>
+          <p className="fee-total-units">TOTAL LOAD UNITS: <strong>{totalUnits}</strong></p>
         </section>
 
         <section className="fee-financial-details">
           <div className="fee-charge-summary">
-            <dl><div><dt>TUITION FEE</dt><dd>48,056.00</dd></div><div><dt>MISCELLANEOUS FEES</dt><dd>6,848.00</dd></div></dl>
+            <dl><div><dt>TUITION FEE</dt><dd>{feeData.tuition}</dd></div><div><dt>MISCELLANEOUS FEES</dt><dd>{feeData.miscellaneous}</dd></div></dl>
             <h2>OTHER CHARGES</h2>
-            <dl>{otherCharges.map(([label, amount]) => <div key={label}><dt>{label}</dt><dd>{amount}</dd></div>)}<div className="fee-subtotal"><dt>TOTAL OTHER CHARGE</dt><dd>17,810.00</dd></div></dl>
-            <dl className="fee-grand-totals"><div><dt>TOTAL ASSESSMENT</dt><dd>Php 72,714.00</dd></div><div><dt>OLD ACCOUNT</dt><dd>Php 0.00</dd></div><div><dt>SCHOLARSHIP/GRANT APPLIED</dt><dd>Php 12,014.00</dd></div><div><dt>BALANCE AFTER GRANT AND DOWNPAYMENT</dt><dd>Php 55,700.00</dd></div></dl>
+            <dl>{otherCharges.map(([label, amount]) => <div key={label}><dt>{label}</dt><dd>{amount}</dd></div>)}<div className="fee-subtotal"><dt>TOTAL OTHER CHARGE</dt><dd>{feeData.otherCharges}</dd></div></dl>
+            <dl className="fee-grand-totals"><div><dt>TOTAL ASSESSMENT</dt><dd>Php {feeData.assessment}</dd></div><div><dt>OLD ACCOUNT</dt><dd>Php 0.00</dd></div><div><dt>SCHOLARSHIP/GRANT APPLIED</dt><dd>Php {feeData.grant}</dd></div><div><dt>BALANCE AFTER GRANT AND DOWNPAYMENT</dt><dd>Php {feeData.balance}</dd></div></dl>
           </div>
           <div className="fee-payment-summary">
-            <dl><div><dt>PAYMENT MODE</dt><dd>Installment</dd></div><div><dt>AMOUNT PAID</dt><dd>5,000.00</dd></div><div><dt>DATE PAID</dt><dd>07/16/2026</dd></div><div><dt>PAYMENT TYPE</dt><dd>Cash</dd></div><div><dt>REFERENCE NUMBER</dt><dd>0007900</dd></div></dl>
-            <p className="fee-receipt">(Business Office) Receipt printed by: <u>JOBERT HONRA AGUIRRE</u></p>
+            <dl><div><dt>PAYMENT MODE</dt><dd>Installment</dd></div><div><dt>AMOUNT PAID</dt><dd>{feeData.paid}</dd></div><div><dt>DATE PAID</dt><dd>07/18/2026</dd></div><div><dt>PAYMENT TYPE</dt><dd>Cash</dd></div><div><dt>REFERENCE NUMBER</dt><dd>0007900</dd></div></dl>
+            <p className="fee-receipt">(Business Office) Receipt printed by: <u>{profile.name}</u></p>
             <dl className="fee-installments"><div><dt>PRELIM DUE</dt><dd>18,500.00</dd></div><div><dt>MIDTERM DUE</dt><dd>18,500.00</dd></div><div><dt>FINAL DUE</dt><dd>18,700.00</dd></div></dl>
             <p className="fee-note">(NOTE: Above installment schedule may change based on actual payment and after enrolment adjustments.)</p>
           </div>
@@ -627,11 +682,13 @@ const ledgerTerms = [
 ];
 
 function LedgerPage() {
-  const [schoolYear, setSchoolYear] = useState("all");
-  const [semester, setSemester] = useState("all");
-  const schoolYears = [...new Set(ledgerTerms.map(({ schoolYear: value }) => value))];
-  const semesters = [...new Set(ledgerTerms.map(({ semester: value }) => value))];
-  const visibleTerms = ledgerTerms.filter((term) => (schoolYear === "all" || term.schoolYear === schoolYear) && (semester === "all" || term.semester === semester));
+  const { ledgerEntries: activeLedgerEntries, currentBalance: activeBalance } = usePortalData();
+  const [schoolYear, setSchoolYear] = useState("2026–2027");
+  const [semester, setSemester] = useState("First Semester");
+  const accountLedgerTerms = [...ledgerTerms.slice(0, -1), { schoolYear: "2026–2027", semester: "First Semester", balance: activeBalance.amount.replace("₱", ""), entries: activeLedgerEntries }];
+  const schoolYears = [...new Set(accountLedgerTerms.map(({ schoolYear: value }) => value))];
+  const semesters = [...new Set(accountLedgerTerms.map(({ semester: value }) => value))];
+  const visibleTerms = accountLedgerTerms.filter((term) => (schoolYear === "all" || term.schoolYear === schoolYear) && (semester === "all" || term.semester === semester));
   const latestBalance = visibleTerms.at(-1)?.balance ?? "0.00";
 
   return (
@@ -644,7 +701,7 @@ function LedgerPage() {
           <label>Semester<select value={semester} onChange={(event) => setSemester(event.target.value)}><option value="all">All semesters</option>{semesters.map((value) => <option value={value} key={value}>{value}</option>)}</select></label>
         </div>
       </section>
-      <div className="ledger-history-summary"><span>{visibleTerms.length === ledgerTerms.length ? "Showing all recorded terms" : `Showing ${visibleTerms.length} filtered ${visibleTerms.length === 1 ? "term" : "terms"}`}</span><strong>Latest balance: ₱{latestBalance}</strong></div>
+      <div className="ledger-history-summary"><span>{visibleTerms.length === accountLedgerTerms.length ? "Showing all recorded terms" : `Showing ${visibleTerms.length} filtered ${visibleTerms.length === 1 ? "term" : "terms"}`}</span><strong>Latest balance: ₱{latestBalance}</strong></div>
       <div className="ledger-term-list">
         {visibleTerms.map((term) => (
           <section className="ledger-term" key={`${term.schoolYear}-${term.semester}`}>
@@ -659,17 +716,19 @@ function LedgerPage() {
 }
 
 function EnrollmentPage({ pageId }) {
+  const { subjects: activeSubjects, gradingRecords: activeGrades, enrolledTerm: activeTerm, periodicDues: activeDues } = usePortalData();
   if (pageId === "enrollment") return <Overview page={pages[pageId]} ids={["subjects-enrolled", "fees-paid-during-enrollment", "submit-admission-requirement"]} />;
   if (pageId === "student-account") return <Overview page={pages[pageId]} ids={["ledger", "periodic-dues"]} />;
   if (pageId === "subjects-enrolled") {
-    const rows = subjects.map(([code, title, lecLabUnits, totalUnits]) => [code, title, lecLabUnits, totalUnits, gradingRecords.find((record) => record.code === code)?.instructor ?? "To be announced"]);
+    const rows = activeSubjects.map(([code, title, lecLabUnits, totalUnits]) => [code, title, lecLabUnits, totalUnits, activeGrades.find((record) => record.code === code)?.instructor ?? "To be announced"]);
+    const totalUnits = activeSubjects.reduce((sum, [, , , units]) => sum + Number(units), 0).toFixed(1);
     return (
       <>
         <PageIntro page={pages[pageId]}><button className="button button-primary print-action" type="button" onClick={() => window.print()}><Icon name="file" /> Print or save as PDF</button></PageIntro>
-        <Panel className="subjects-enrolled-paper" title={`Enrolled ${enrolledTerm.label}`} subtitle={`Enrollment date: ${enrolledTerm.officialDate}`}>
+        <Panel className="subjects-enrolled-paper" title={`Enrolled ${activeTerm.label}`} subtitle={`Enrollment date: ${activeTerm.officialDate}`}>
           <div className="term-summary">
-            <span>Maximum units this semester <strong>{enrolledTerm.maximumUnits}</strong></span>
-            <span>Total units load taken <strong>{enrolledTerm.totalUnits}</strong></span>
+            <span>Maximum units this semester <strong>{activeTerm.maximumUnits}</strong></span>
+            <span>Total units load taken <strong>{totalUnits}</strong></span>
           </div>
           <DataTable headers={["Subject code", "Subject title", "LEC/LAB units", "Total units", "Faculty assigned"]} rows={rows} label="Subjects enrolled" />
         </Panel>
@@ -679,7 +738,7 @@ function EnrollmentPage({ pageId }) {
   if (pageId === "fees-paid-during-enrollment") return <FeePaymentDocument />;
   if (pageId === "submit-admission-requirement") return <AdmissionPage />;
   if (pageId === "ledger") return <LedgerPage />;
-  const duesRows = periodicDues.map(([period, required, cumulative]) => [period, required, cumulative]);
+  const duesRows = activeDues.map(([period, required, cumulative]) => [period, required, cumulative]);
   return (
     <>
       <PageIntro page={pages[pageId]} />
@@ -710,14 +769,15 @@ const evaluationSections = [
 ];
 
 function FacultyEvaluation() {
-  const [evaluations, setEvaluations] = useLocalStorage("myau-faculty-evaluations", []);
+  const { profile, subjects: activeSubjects, gradingRecords: activeGrades } = usePortalData();
+  const [evaluations, setEvaluations] = useLocalStorage(`myau-faculty-evaluations-${profile.id}`, []);
   const [selectedFaculty, setSelectedFaculty] = useState(null);
   const [feedback, setFeedback] = useState("");
   const [loading, setLoading] = useState(false);
   const evaluationFormRef = useRef(null);
 
   function chooseFaculty(code, title) {
-    setSelectedFaculty({ code, title, faculty: gradingRecords.find((record) => record.code === code)?.instructor ?? "Faculty member", schedule: feePaymentSubjects.find(([subjectCode]) => subjectCode === code)?.[2] ?? "Assigned schedule" });
+    setSelectedFaculty({ code, title, faculty: activeGrades.find((record) => record.code === code)?.instructor ?? "Faculty member", schedule: feePaymentSubjects.find(([subjectCode]) => subjectCode === code)?.[2] ?? "Assigned schedule" });
     setFeedback("");
     window.requestAnimationFrame(() => {
       evaluationFormRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -746,10 +806,10 @@ function FacultyEvaluation() {
       <section className="faculty-list" aria-label="Faculty teaching currently enrolled subjects">
         <h2 className="faculty-list-title">Faculty for your enrolled subjects</h2>
         <div className="faculty-card-grid">
-          {subjects.map(([code, title]) => (
+          {activeSubjects.map(([code, title]) => (
             <article className="faculty-card" key={code}>
               <div className="faculty-photo-placeholder" role="img" aria-label="Faculty photo placeholder"><Icon name="user" /><span>Faculty</span></div>
-              <div className="faculty-card-details"><h3>{gradingRecords.find((record) => record.code === code)?.instructor ?? "Faculty member"}</h3><p className="faculty-subject-code">{code}</p><p className="faculty-subject-title">{title}</p><button className="button button-secondary faculty-evaluate-button" type="button" onClick={() => chooseFaculty(code, title)}>Evaluate this faculty</button></div>
+              <div className="faculty-card-details"><h3>{activeGrades.find((record) => record.code === code)?.instructor ?? "Faculty member"}</h3><p className="faculty-subject-code">{code}</p><p className="faculty-subject-title">{title}</p><button className="button button-secondary faculty-evaluate-button" type="button" onClick={() => chooseFaculty(code, title)}>Evaluate this faculty</button></div>
             </article>
           ))}
         </div>
@@ -777,13 +837,19 @@ function FacultyEvaluation() {
 function PaymentPage() {
   const [session] = useLocalStorage("myau-demo-session", null);
   const account = demoAccounts.find((item) => item.username === session?.username) ?? demoAccounts[0];
-  const [profile] = useLocalStorage(`myau-personal-info-${account.username}`, account.profile);
+  const profileStorageKey = account.username === "AUFAGUIRRE15" ? "myau-personal-info-AUFAGUIRRE15-v2" : "myau-personal-info-MYAUDEMO-v2";
+  const [profile] = useLocalStorage(profileStorageKey, account.profile);
+  const accountData = account.data ?? {};
+  const activeBalance = accountData.currentBalance ?? currentBalance;
+  const activeDues = accountData.periodicDues ?? periodicDues;
+  const activeLedger = accountData.ledgerEntries ?? ledgerEntries;
+  const activeFee = accountData.fee ?? { assessment: "72,714.00", grant: "12,014.00", paid: "25,000.00" };
   const [paymentType, setPaymentType] = useState("installment");
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState("");
   const paymentTypes = [
-    { id: "installment", label: "Installment fee", description: "Pay a scheduled installment.", amount: "₱18,500.00" },
+    { id: "installment", label: "Installment fee", description: "Pay a scheduled installment.", amount: `₱${activeDues[1][1]}` },
     { id: "other-fee", label: "Other school fee", description: "Settle laboratory or service-related fees.", amount: "₱1,919.00" },
     { id: "downpayment", label: "Downpayment", description: "Make an additional payment to your balance.", amount: "₱5,000.00" },
   ];
@@ -807,7 +873,7 @@ function PaymentPage() {
       <div className="payment-standalone-content">
         <section className="payment-summary-card" aria-labelledby="payment-summary-title">
           <div><p className="payment-eyebrow">Student account</p><h1 id="payment-summary-title">Payment summary</h1><p className="payment-student-name">{profile.name} <span>· {profile.id}</span></p></div>
-          <div className="payment-balance-overview"><span>Outstanding balance</span><strong>{currentBalance.amount}</strong><small>First Semester, 2026–2027</small></div>
+          <div className="payment-balance-overview"><span>Outstanding balance</span><strong>{activeBalance.amount}</strong><small>First Semester, 2026–2027</small></div>
         </section>
         <section className="payment-checkout" aria-labelledby="make-payment-title">
           <div className="payment-checkout-main">
@@ -842,9 +908,9 @@ function PaymentPage() {
         <section className="payment-account-details" aria-labelledby="payment-account-details-title">
           <div className="payment-section-heading"><div><p className="payment-eyebrow">Account details</p><h2 id="payment-account-details-title">Charges and payment activity</h2></div><span>Current term</span></div>
           <div className="payment-tables">
-            <section><h3>Current charges</h3><table><thead><tr><th>Item</th><th>Amount</th></tr></thead><tbody><tr><td>Tuition and school fees</td><td>₱72,714.00</td></tr><tr><td>Scholarship / grant</td><td>− ₱12,014.00</td></tr><tr><td>Payments received</td><td>− ₱25,000.00</td></tr></tbody></table></section>
-            <section><h3>Installment schedule</h3><p className="payment-table-note">Original schedule. Grants and payments applied to date are reflected in the outstanding balance.</p><table><thead><tr><th>Due period</th><th>Amount</th></tr></thead><tbody><tr><td>Prelim</td><td>₱18,500.00</td></tr><tr><td>Midterm</td><td>₱18,500.00</td></tr><tr><td>Final</td><td>₱18,700.00</td></tr></tbody></table></section>
-            <section><h3>Recent payments</h3><table><thead><tr><th>Date</th><th>Amount</th></tr></thead><tbody><tr><td>Nov 09, 2026</td><td>₱10,000.00</td></tr><tr><td>Nov 03, 2026</td><td>₱10,000.00</td></tr><tr><td>Jul 16, 2026</td><td>₱5,000.00</td></tr></tbody></table></section>
+            <section><h3>Current charges</h3><table><thead><tr><th>Item</th><th>Amount</th></tr></thead><tbody><tr><td>Tuition and school fees</td><td>₱{activeFee.assessment}</td></tr><tr><td>Scholarship / grant</td><td>− ₱{activeFee.grant}</td></tr><tr><td>Payments received</td><td>− ₱{activeFee.paid}</td></tr></tbody></table></section>
+            <section><h3>Installment schedule</h3><p className="payment-table-note">Original schedule. Grants and payments applied to date are reflected in the outstanding balance.</p><table><thead><tr><th>Due period</th><th>Amount</th></tr></thead><tbody>{activeDues.map(([period, amount]) => <tr key={period}><td>{period}</td><td>₱{amount}</td></tr>)}</tbody></table></section>
+            <section><h3>Recent payments</h3><table><thead><tr><th>Date</th><th>Amount</th></tr></thead><tbody>{activeLedger.filter(([, , , debit, credit]) => debit === "—" && credit !== "0.00").slice(-3).reverse().map(([date, , , , credit]) => <tr key={`${date}-${credit}`}><td>{date}</td><td>₱{credit}</td></tr>)}</tbody></table></section>
           </div>
         </section>
       </div>

@@ -7,6 +7,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [messageTone, setMessageTone] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const [, setSession] = useLocalStorage("myau-demo-session", null);
 
   function signIn(event) {
@@ -56,7 +57,10 @@ export default function LoginPage() {
             <label htmlFor="login-username">Username</label>
             <input id="login-username" name="username" type="text" autoComplete="username" aria-describedby="login-feedback" />
             <label htmlFor="login-password">Password</label>
-            <input id="login-password" name="password" type="password" autoComplete="current-password" aria-describedby="login-feedback" />
+            <div className="login-password-wrap">
+              <input id="login-password" name="password" type={passwordVisible ? "text" : "password"} autoComplete="current-password" aria-describedby="login-feedback" />
+              <button className="login-password-toggle" type="button" onClick={() => setPasswordVisible((value) => !value)} aria-label={passwordVisible ? "Hide password" : "Show password"}>{passwordVisible ? "Hide" : "Show"}</button>
+            </div>
             <button className="login-submit" type="submit">Login</button>
           </form>
 

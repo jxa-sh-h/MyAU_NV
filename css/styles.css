@@ -61,6 +61,10 @@ button:focus-visible, a:focus-visible { outline: none; box-shadow: var(--focus);
 .login-form input { width: 100%; min-height: 49px; margin: 0 0 18px; padding: 11px 13px; border: 1px solid #d5dee6; border-radius: 9px; color: #1c2c3c; background: #fff; font: inherit; transition: border-color .15s ease, box-shadow .15s ease; }
 .login-form input:hover { border-color: #9eafbf; }
 .login-form input:focus { border-color: #0878ed; outline: none; box-shadow: 0 0 0 3px rgb(8 120 237 / 15%); }
+.login-password-wrap { position: relative; margin-bottom: 18px; }
+.login-password-wrap input { margin-bottom: 0; padding-right: 58px; }
+.login-password-toggle { position: absolute; top: 50%; right: 8px; padding: 5px 7px; border: 0; border-radius: 6px; color: var(--blue-800); background: transparent; font-size: 10px; font-weight: 800; transform: translateY(-50%); cursor: pointer; }
+.login-password-toggle:hover { background: #eef5fb; }
 .login-submit { min-height: 48px; margin: 5px 0 4px; padding: 11px 18px; border: 0; border-radius: 9px; color: white; background: #123f70; font-size: 14px; font-weight: 750; letter-spacing: .025em; cursor: pointer; transition: background .15s ease, transform .15s ease, box-shadow .15s ease; }
 .login-submit:hover { background: #0c3159; box-shadow: 0 5px 14px rgb(18 63 112 / 20%); transform: translateY(-1px); }
 .login-text-link { padding: 3px 0; border: 0; color: #1762a5; background: transparent; font-size: 12px; font-weight: 700; cursor: pointer; }
@@ -853,6 +857,18 @@ tbody tr:hover { background: #f0f3fa; }
 .app-store-links a:hover { border-color: var(--gold-500); background: var(--gold-100); }
 .summary-card .summary-details, .summary-card .summary-details strong { min-width: 0; }
 .summary-card .summary-value { overflow-wrap: anywhere; }
+.hero-art.mascot-art { width: clamp(175px, 19vw, 230px); height: 205px; flex: 0 0 auto; margin: 0 1% 0 0; overflow: visible; border: 0; border-radius: 0; background: transparent; transform: none; }
+@media (max-width: 760px) {
+  .hero-art.mascot-art { width: 170px; height: 180px; margin-right: 0; }
+}
+@media (max-width: 540px) {
+  .hero { display: grid; grid-template-columns: minmax(0, 1fr) 104px; align-items: center; gap: 7px; padding: 22px 16px; }
+  .hero-content { min-width: 0; }
+  .hero h2 { font-size: 21px; }
+  .hero p { margin-bottom: 12px; font-size: 11px; }
+  .hero .button { min-height: 34px; padding: 0 9px; font-size: 10px; white-space: normal; }
+  .hero-art.mascot-art { position: relative; top: auto; right: auto; bottom: auto; width: 104px; height: 150px; margin: 0; opacity: 1; }
+}
 .demo-note { max-width: none; margin-top: 18px; }
 
 @media (max-width: 1000px) {
@@ -895,4 +911,92 @@ tbody tr:hover { background: #f0f3fa; }
   .term-summary, .account-term-summary { font-size: 11px; }
   .ledger-history-summary { align-items: flex-start; flex-direction: column; }
   .ledger-history-summary strong { align-self: stretch; }
+}
+
+/* Flush-bottom mascot hero with a quiet campus pattern. */
+.hero {
+  min-height: 252px;
+  padding-right: clamp(230px, 27vw, 320px);
+}
+.hero::before {
+  background: repeating-linear-gradient(38deg, transparent 0 25px, rgb(255 255 255 / 4%) 26px 27px, transparent 28px 53px);
+  -webkit-mask-image: radial-gradient(circle, #000 24%, transparent 76%);
+  mask-image: radial-gradient(circle, #000 24%, transparent 76%);
+}
+.hero::after {
+  border: 1px solid rgb(255 255 255 / 8%);
+  background-image: radial-gradient(circle, rgb(255 255 255 / 7%) 1px, transparent 1.5px);
+  background-size: 18px 18px;
+}
+.hero-art.mascot-art {
+  position: absolute;
+  right: 12px;
+  bottom: 0;
+  display: flex;
+  width: clamp(230px, 27vw, 300px);
+  height: 250px;
+  align-items: flex-end;
+  justify-content: center;
+  margin: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  transform: none;
+}
+.mascot-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  filter: drop-shadow(0 7px 9px rgb(7 20 67 / 14%));
+  animation: mascot-appear .3s ease-out both;
+}
+@keyframes mascot-appear {
+  from { opacity: .75; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 1000px) {
+  .hero { min-height: 240px; padding-right: 230px; }
+  .hero-art.mascot-art { right: 0; width: 225px; height: 238px; }
+}
+@media (max-width: 760px) {
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(145px, 33%);
+    min-height: 225px;
+    align-items: stretch;
+    gap: 10px;
+    padding: 24px 18px 0;
+  }
+  .hero-content { min-width: 0; }
+  .hero-art.mascot-art {
+    position: relative;
+    inset: auto;
+    grid-column: 2;
+    grid-row: 1;
+    width: 100%;
+    height: auto;
+    min-height: 225px;
+    align-self: stretch;
+    overflow: hidden;
+    opacity: 1;
+  }
+}
+@media (max-width: 540px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr) 100px;
+    min-height: 210px;
+    gap: 5px;
+    padding: 20px 14px 0;
+  }
+  .hero-content { padding-bottom: 14px; }
+  .hero h2 { font-size: 20px; }
+  .hero p { margin-bottom: 11px; font-size: 11px; line-height: 1.5; }
+  .hero .button { max-width: 100%; min-height: 34px; padding: 0 9px; font-size: 10px; white-space: normal; }
+  .hero-art.mascot-art { min-height: 185px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mascot-image { animation: none; }
 }
