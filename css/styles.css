@@ -67,6 +67,8 @@ button:focus-visible, a:focus-visible { outline: none; box-shadow: var(--focus);
 .login-text-link:hover { color: #0d477d; text-decoration: underline; }
 .login-forgot-link { display: block; margin: 10px auto 0; }
 .login-message { min-height: 16px; margin: 8px 0 0; color: #566779; font-size: 11px; text-align: center; }
+.login-message.error { color: #b42318; }
+.login-message.success { color: #087f56; }
 .login-register { display: flex; align-items: center; justify-content: center; gap: 5px; margin: 17px 0 0; padding-top: 16px; border-top: 1px solid #e8edf1; color: #617182; font-size: 12px; }
 .login-demo-note { margin: 15px 0 0; color: #8793a0; font-size: 10px; text-align: center; }
 
@@ -834,6 +836,23 @@ tbody tr:hover { background: #f0f3fa; }
 .payment-demo-note { margin: -5px 0 14px; padding: 9px 11px; border-left: 3px solid var(--gold-500); border-radius: 0 7px 7px 0; color: #6f561e; background: #fbf5e6; font-size: 12px; line-height: 1.5; }
 .payment-table-note { margin: -3px 0 9px; color: var(--muted); font-size: 11px; line-height: 1.5; }
 .payment-account-details tfoot th { border-top: 2px solid #d7dfef; color: var(--blue-950); background: #f3f5fb; }
+.dashboard-account-card { display: flex; flex-direction: column; align-items: flex-start; }
+.dashboard-account-card .service-title { margin-bottom: 9px; }
+.dashboard-brand-logo { display: block; width: 32px; height: 32px; flex: 0 0 32px; object-fit: contain; }
+.service-account-link { display: flex; max-width: 100%; align-items: center; gap: 6px; margin: 0 0 10px; color: var(--blue-900); font-size: 12px; font-weight: 750; line-height: 1.5; overflow-wrap: anywhere; }
+.service-account-link svg { width: 14px; height: 14px; flex: 0 0 auto; }
+.dashboard-help-details { width: 100%; margin: 2px 0 9px; border-top: 1px solid #e8edf3; }
+.dashboard-help-details summary { padding: 10px 0 7px; color: var(--blue-800); font-size: 11px; font-weight: 750; cursor: pointer; }
+.dashboard-help-details summary:hover { color: var(--blue-950); }
+.dashboard-help-copy { padding: 2px 0 1px; }
+.dashboard-help-copy p { margin: 0 0 9px; color: var(--muted-dark); font-size: 11px; line-height: 1.6; }
+.dashboard-help-copy p:last-child { margin-bottom: 5px; }
+.dashboard-help-copy a { color: var(--blue-800); font-weight: 650; text-decoration: underline; text-underline-offset: 2px; }
+.app-store-links { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; }
+.app-store-links a { display: inline-flex; min-height: 32px; align-items: center; padding: 0 11px; border: 1px solid #d8dfed; border-radius: 7px; color: var(--blue-950); background: #f8f9fc; font-size: 10px; font-weight: 750; }
+.app-store-links a:hover { border-color: var(--gold-500); background: var(--gold-100); }
+.summary-card .summary-details, .summary-card .summary-details strong { min-width: 0; }
+.summary-card .summary-value { overflow-wrap: anywhere; }
 .demo-note { max-width: none; margin-top: 18px; }
 
 @media (max-width: 1000px) {

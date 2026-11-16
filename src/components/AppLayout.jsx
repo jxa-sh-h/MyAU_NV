@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { navigationGroups, pages, standalonePages, student } from "../data/mockData.js";
 import { useLocalStorage } from "../hooks/useLocalStorage.js";
 import { StudentProfileContext } from "../contexts/StudentProfileContext.jsx";
+import { demoAccounts } from "../data/demoAccounts.js";
 import Icon from "./Icon.jsx";
 
 function routeFor(id) {
@@ -50,14 +51,13 @@ function NavigationGroup({ group, activePage, onNavigate }) {
   );
 }
 
-function StudentPanel({ profile }) {
-  const navigate = useNavigate();
+function StudentPanel({ profile, onLogout }) {
   return (
     <section className="student-panel" aria-label="Student information">
       <div className="student-panel-header">
         <div className="avatar avatar-large">AJ</div>
         <div className="student-info"><span className="student-id">{profile.id}</span><strong title={profile.name}>{profile.name}</strong></div>
-        <button className="logout-button" type="button" onClick={() => navigate("/")}>Logout</button>
+        <button className="logout-button" type="button" onClick={onLogout}>Logout</button>
       </div>
       <div className="student-meta">
         <span><small>Academic year</small><strong>{profile.academicYear}</strong></span>
@@ -70,8 +70,11 @@ function StudentPanel({ profile }) {
 }
 
 export default function AppLayout({ activePage, children }) {
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [profile, setProfile] = useLocalStorage("myau-personal-info", { ...student, email: "", contactMobile: "" });
+  const [session, setSession] = useLocalStorage("myau-demo-session", null);
+  const account = demoAccounts.find((item) => item.username === session?.username) ?? demoAccounts[0];
+  const [profile, setProfile] = useLocalStorage(`myau-personal-info-${account.username}`, account.profile ?? { ...student, email: "", contactMobile: "" });
   const menuButtonRef = useRef(null);
   const active = pages[activePage] ?? pages.dashboard;
 
@@ -94,6 +97,11 @@ export default function AppLayout({ activePage, children }) {
     setMenuOpen(false);
   }
 
+  function logout() {
+    setSession(null);
+    navigate("/");
+  }
+
   return (
     <StudentProfileContext.Provider value={{ profile, setProfile }}>
       <a className="skip-link" href="#main-content">Skip to main content</a>
@@ -107,7 +115,7 @@ export default function AppLayout({ activePage, children }) {
             <span className="sidebar-brand-mark" aria-hidden="true">AUF</span>
             <span><strong>MyAU</strong><small>STUDENT PORTAL</small></span>
           </Link>
-          <StudentPanel profile={profile} />
+          <StudentPanel profile={profile} onLogout={logout} />
           <nav className="primary-nav" aria-label="Student portal">
             <NavLink id="dashboard" label="Dashboard" icon="dashboard" activePage={activePage} onNavigate={closeMenu} />
             <NavLink id="student-clearance" label="Student Clearance" icon="clearance" activePage={activePage} onNavigate={closeMenu} />

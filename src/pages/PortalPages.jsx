@@ -19,6 +19,7 @@ import {
 } from "../data/mockData.js";
 import { useLocalStorage } from "../hooks/useLocalStorage.js";
 import { useStudentProfile } from "../contexts/StudentProfileContext.jsx";
+import { demoAccounts } from "../data/demoAccounts.js";
 import Icon from "../components/Icon.jsx";
 import { Badge, DataTable, DemoNote, Feedback, PageHeading, Panel, SectionCards } from "../components/UI.jsx";
 
@@ -48,7 +49,21 @@ function Overview({ page, ids }) {
 
 function Dashboard() {
   const today = new Intl.DateTimeFormat("en-PH", { weekday: "long", month: "long", day: "numeric", year: "numeric" }).format(new Date());
-  const enrolledUnits = subjects.reduce((total, [, , , units]) => total + Number(units), 0);
+  const hasPendingClearance = currentBalance.status === "Outstanding"
+    || disciplineStatus.activeNotices.length > 0
+    || otherPendingClearances.length > 0
+    || circulationDetails.some(([item, value]) => /overdue|fine/i.test(item) && !/^₱?0(?:\.00)?$/.test(value.trim()));
+  const clearanceCard = hasPendingClearance ? (
+    <Link className="summary-card" to="/index.html#student-clearance">
+      <span className="summary-icon amber"><Icon name="check" /></span>
+      <span className="summary-details"><span className="summary-label">Student clearance</span><strong className="summary-value">Needs attention</strong><span className="summary-meta">Review pending items</span></span>
+    </Link>
+  ) : (
+    <article className="summary-card">
+      <span className="summary-icon teal"><Icon name="check" /></span>
+      <span className="summary-details"><span className="summary-label">Student clearance</span><strong className="summary-value">Cleared</strong><span className="summary-meta">No pending requirements</span></span>
+    </article>
+  );
   return (
     <>
       <PageHeading page={{ section: "Student Portal", title: "Welcome back", description: "Here’s your academic snapshot and the latest campus updates." }}>
@@ -63,10 +78,10 @@ function Dashboard() {
         <div className="hero-art" aria-hidden="true"><div className="hero-art-inner"><Icon name="graduation" /></div></div>
       </section>
       <div className="summary-grid">
-        <article className="summary-card"><span className="summary-icon amber"><Icon name="check" /></span><div className="summary-details"><span className="summary-label">Clearance status</span><strong className="summary-value">Needs attention</strong><span className="summary-meta">Review the outstanding requirements</span></div></article>
-        <article className="summary-card"><span className="summary-icon blue"><Icon name="book" /></span><div className="summary-details"><span className="summary-label">Enrolled subjects</span><strong className="summary-value">{subjects.length} subjects</strong><span className="summary-meta">{enrolledUnits} academic units</span></div></article>
-        <Link className="summary-card" to="/pages/online-payment.html"><span className="summary-icon amber"><Icon name="wallet" /></span><span className="summary-details"><span className="summary-label">Outstanding balance</span><strong className="summary-value">{currentBalance.amount}</strong><span className="summary-meta">View account and payment schedule</span></span></Link>
-        <Link className="summary-card" to="/index.html#student-clearance"><span className="summary-icon blue"><Icon name="shield" /></span><span className="summary-details"><span className="summary-label">Discipline standing</span><strong className="summary-value">{disciplineStatus.currentStanding}</strong><span className="summary-meta">{disciplineStatus.activeNotices.length} active notices</span></span></Link>
+        {clearanceCard}
+        <article className="summary-card"><span className="summary-icon blue"><Icon name="graduation" /></span><span className="summary-details"><span className="summary-label">Academic interventions</span><strong className="summary-value">Talk to an adviser</strong><span className="summary-meta">Ask about academic support options</span></span></article>
+        <Link className="summary-card" to="/pages/online-payment.html"><span className="summary-icon amber"><Icon name="wallet" /></span><span className="summary-details"><span className="summary-label">Account balance</span><strong className="summary-value">{currentBalance.status}</strong><span className="summary-meta">View payment details</span></span></Link>
+        <Link className="summary-card" to="/pages/faculty-evaluation.html"><span className="summary-icon blue"><Icon name="star" /></span><span className="summary-details"><span className="summary-label">Faculty evaluation</span><strong className="summary-value">Open evaluation</strong><span className="summary-meta">Share feedback on your classes</span></span></Link>
       </div>
       <section className="dashboard-columns" aria-label="Campus updates and student services">
         <div>
@@ -83,9 +98,33 @@ function Dashboard() {
           </section>
         </div>
         <div className="right-column">
-          <section className="service-card"><div className="service-title"><span className="service-icon"><Icon name="email" /></span><h2>Your AUF email</h2></div><p>Use your AUF student email for official university communication, account updates, and announcements.</p><Link className="service-action" to="/index.html#student-clearance">Check student services <Icon name="arrow" /></Link></section>
-          <section className="service-card"><div className="service-title"><span className="service-icon"><Icon name="lms" /></span><h2>MyClass (Canvas LMS)</h2></div><p>Find course materials and class announcements in your enrolled courses.</p><Link className="service-action" to="/index.html#subjects-enrolled">View my subjects <Icon name="arrow" /></Link></section>
-          <section className="intervention-card"><div className="service-title"><span className="service-icon service-icon-amber"><Icon name="graduation" /></span><h2>Academic support</h2></div><p>Connect with your faculty adviser to learn about academic support and intervention options.</p></section>
+          <section className="service-card dashboard-account-card">
+            <div className="service-title"><img className="dashboard-brand-logo" src="/img/gmail_logo.png" alt="" aria-hidden="true" /><h2>MyAU Mail</h2></div>
+            <a className="service-account-link" href="https://mail.auf.edu.ph/" target="_blank" rel="noopener noreferrer">aguirre.jobert@student.auf.edu.ph <Icon name="external" /></a>
+            <details className="dashboard-help-details">
+              <summary>Setup and support</summary>
+              <div className="dashboard-help-copy">
+                <p><strong>New students:</strong> Your MyAU Mail account and login credentials are sent to your registered personal email after admission. Check your spam folder if they are missing.</p>
+                <p>For help, email <a href="mailto:mailadmin@auf.edu.ph">mailadmin@auf.edu.ph</a> and attach an image of your AUF ID or another identification document.</p>
+              </div>
+            </details>
+            <a className="service-action" href="https://mail.auf.edu.ph/" target="_blank" rel="noopener noreferrer">Sign in to MyAU Mail <Icon name="arrow" /></a>
+          </section>
+          <section className="service-card dashboard-account-card">
+            <div className="service-title"><img className="dashboard-brand-logo" src="/img/canvas_logo.png" alt="" aria-hidden="true" /><h2>MyClass · Canvas LMS</h2></div>
+            <div className="app-store-links" aria-label="Canvas Student app downloads">
+              <a href="https://play.google.com/store/apps/details?id=com.instructure.candroid" target="_blank" rel="noopener noreferrer">Google Play</a>
+              <a href="https://apps.apple.com/app/id480883488" target="_blank" rel="noopener noreferrer">App Store</a>
+            </div>
+            <details className="dashboard-help-details">
+              <summary>Login instructions and support</summary>
+              <div className="dashboard-help-copy">
+                <p>Use your student ID as your username and your initial password to sign in. After logging in, change your password under <strong>Account → Settings → Edit Settings → Change Password</strong>.</p>
+                <p>New accounts are typically created and activated after the enrollment period. AUF will post an announcement when they are ready.</p>
+                <p>For help, email <a href="mailto:myclass@auf.edu.ph">myclass@auf.edu.ph</a> using your <a href="https://mail.auf.edu.ph/" target="_blank" rel="noopener noreferrer">MyAU Mail</a>.</p>
+              </div>
+            </details>
+          </section>
         </div>
       </section>
       <Note />
@@ -736,7 +775,9 @@ function FacultyEvaluation() {
 }
 
 function PaymentPage() {
-  const [profile] = useLocalStorage("myau-personal-info", { ...student, email: "", contactMobile: "" });
+  const [session] = useLocalStorage("myau-demo-session", null);
+  const account = demoAccounts.find((item) => item.username === session?.username) ?? demoAccounts[0];
+  const [profile] = useLocalStorage(`myau-personal-info-${account.username}`, account.profile);
   const [paymentType, setPaymentType] = useState("installment");
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [loading, setLoading] = useState(false);

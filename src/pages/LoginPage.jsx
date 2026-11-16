@@ -1,13 +1,34 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { findDemoAccount } from "../data/demoAccounts.js";
+import { useLocalStorage } from "../hooks/useLocalStorage.js";
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const [message, setMessage] = useState("");
+  const [messageTone, setMessageTone] = useState("");
+  const [, setSession] = useLocalStorage("myau-demo-session", null);
 
   function signIn(event) {
     event.preventDefault();
-    navigate("/index.html#dashboard");
+    const data = new FormData(event.currentTarget);
+    const username = String(data.get("username") || "").trim();
+    const password = String(data.get("password") || "");
+    if (!username || !password) {
+      setMessageTone("error");
+      setMessage("Enter both your username and password.");
+      return;
+    }
+    const account = findDemoAccount(username);
+    if (!account || account.password !== password) {
+      setMessageTone("error");
+      setMessage("The username or password is incorrect. Please try again.");
+      return;
+    }
+    setSession({ username: account.username });
+    setMessageTone("success");
+    setMessage("Sign-in successful. Opening your portal…");
+    window.setTimeout(() => navigate("/index.html#dashboard"), 250);
   }
 
   return (
@@ -33,23 +54,23 @@ export default function LoginPage() {
           </div>
           <form className="login-form" onSubmit={signIn}>
             <label htmlFor="login-username">Username</label>
-            <input id="login-username" name="username" type="text" autoComplete="username" />
+            <input id="login-username" name="username" type="text" autoComplete="username" aria-describedby="login-feedback" />
             <label htmlFor="login-password">Password</label>
-            <input id="login-password" name="password" type="password" autoComplete="current-password" />
+            <input id="login-password" name="password" type="password" autoComplete="current-password" aria-describedby="login-feedback" />
             <button className="login-submit" type="submit">Login</button>
           </form>
 
           <button className="login-text-link login-forgot-link" type="button" onClick={() => setMessage("Password recovery is not available in this demo.")}>
             Forgot password
           </button>
-          <p className="login-message" role="status" aria-live="polite">{message}</p>
+          <p className={`login-message${messageTone ? ` ${messageTone}` : ""}`} id="login-feedback" role="status" aria-live="polite">{message}</p>
           <div className="login-register">
             <span>New to AUF?</span>
             <button className="login-text-link" type="button" onClick={() => setMessage("New student registration is not available in this demo.")}>
               Sign up here
             </button>
           </div>
-          <p className="login-demo-note">Demo portal · Login does not require credentials</p>
+          <p className="login-demo-note">Simulated sign-in · No real account access</p>
         </section>
       </div>
     </main>
