@@ -36,12 +36,12 @@ export function Dashboard() {
   const clearanceCard = hasPendingClearance ? (
     <Link className="summary-card" to="/index.html#student-clearance">
       <span className="summary-icon amber"><Icon name="check" /></span>
-      <span className="summary-details"><span className="summary-label">Student clearance</span><strong className="summary-value">Needs attention</strong><span className="summary-meta">Review pending items</span></span>
+      <span className="summary-description"><span className="summary-label">Student clearance</span><span className="summary-meta">Review pending items</span></span><strong className="summary-title">Needs attention</strong>
     </Link>
   ) : (
     <article className="summary-card">
       <span className="summary-icon teal"><Icon name="check" /></span>
-      <span className="summary-details"><span className="summary-label">Student clearance</span><strong className="summary-value">Cleared</strong><span className="summary-meta">No pending requirements</span></span>
+      <span className="summary-description"><span className="summary-label">Student clearance</span><span className="summary-meta">No pending requirements</span></span><strong className="summary-title">Cleared</strong>
     </article>
   );
   return (
@@ -70,9 +70,9 @@ export function Dashboard() {
       </section>
       <div className="summary-grid">
         {clearanceCard}
-        <article className="summary-card"><span className="summary-icon blue"><Icon name="graduation" /></span><span className="summary-details"><span className="summary-label">Academic interventions</span><strong className="summary-value">Talk to an adviser</strong><span className="summary-meta">Ask about academic support options</span></span></article>
-        <Link className="summary-card" to="/pages/online-payment.html"><span className="summary-icon amber"><Icon name="wallet" /></span><span className="summary-details"><span className="summary-label">Account balance</span><strong className="summary-value">{activeBalance.status}</strong><span className="summary-meta">View payment details</span></span></Link>
-        <Link className="summary-card" to="/pages/faculty-evaluation.html"><span className="summary-icon blue"><Icon name="star" /></span><span className="summary-details"><span className="summary-label">Faculty evaluation</span><strong className="summary-value">Open evaluation</strong><span className="summary-meta">Share feedback on your classes</span></span></Link>
+        <article className="summary-card"><span className="summary-icon blue"><Icon name="graduation" /></span><span className="summary-description"><span className="summary-label">Academic interventions</span><span className="summary-meta">Ask about academic support options</span></span><strong className="summary-title">Talk to an adviser</strong></article>
+        <Link className="summary-card" to="/pages/online-payment.html"><span className="summary-icon amber"><Icon name="wallet" /></span><span className="summary-description"><span className="summary-label">Account balance</span><span className="summary-meta">View payment details</span></span><strong className="summary-title">{activeBalance.status}</strong></Link>
+        <Link className="summary-card" to="/pages/faculty-evaluation.html"><span className="summary-icon blue"><Icon name="star" /></span><span className="summary-description"><span className="summary-label">Faculty evaluation</span><span className="summary-meta">Share feedback on your classes</span></span><strong className="summary-title">Open evaluation</strong></Link>
       </div>
       <section className="dashboard-columns" aria-label="Campus updates and student services">
         <div>

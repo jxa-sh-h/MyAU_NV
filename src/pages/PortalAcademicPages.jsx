@@ -4,6 +4,7 @@ import { Panel } from "../components/UI.jsx";
 import { Overview, PageIntro, SimpleDataPage, usePortalData } from "./PortalPageShared.jsx";
 
 export function CheckListPage() {
+  const [viewMode, setViewMode] = useState("table");
   const { profile, subjects: activeSubjects, checkListTerms: activeCheckListTerms } = usePortalData();
   const terms = profile.program === "BSCE"
     ? [
@@ -23,6 +24,13 @@ export function CheckListPage() {
     <>
       <PageIntro page={pages["check-list"]} />
       <Panel title="Course progress by term" subtitle="Course sequence, required units, earned credits, and grades from the academic record.">
+        <div className="checklist-toolbar">
+          <span className="checklist-view-label">View format</span>
+          <div className="checklist-view-toggle" role="group" aria-label="Course checklist view format">
+            <button className={viewMode === "table" ? "is-active" : ""} type="button" aria-pressed={viewMode === "table"} onClick={() => setViewMode("table")}>Table</button>
+            <button className={viewMode === "list" ? "is-active" : ""} type="button" aria-pressed={viewMode === "list"} onClick={() => setViewMode("list")}>List</button>
+          </div>
+        </div>
         <div className="checklist-legend" aria-label="Course status legend">
           {Object.entries(statusLabels).map(([status, label]) => (
             <span className="checklist-legend-item" key={status}>
@@ -31,7 +39,14 @@ export function CheckListPage() {
             </span>
           ))}
         </div>
-        <div className="checklist-scroll" role="region" aria-label="Academic course flowchart" tabIndex="0">
+        {viewMode === "list" ? <div className="checklist-list" aria-label="Academic course checklist list">
+          {terms.map((term) => <section className="checklist-list-term" key={`${term.year}-${term.semester}`}>
+            <header><div><strong>{term.year} · {term.semester}</strong><span>Required {term.requiredUnits} · Credited {term.creditedUnits}</span></div></header>
+            <div className="checklist-list-courses">{term.courses.map((course) => <article className={`checklist-list-course status-${course.status}`} key={`${term.year}-${term.semester}-${course.code}`}>
+              <div><strong>{course.code}</strong><span>{course.title}</span></div><div className="checklist-list-meta"><span>{course.units} units{course.earnedUnits !== undefined && ` · ${course.earnedUnits} earned`}</span><b>{statusLabels[course.status]}</b>{course.grade !== undefined && <em>Grade {course.grade}</em>}</div>
+            </article>)}</div>
+          </section>)}
+        </div> : <div className="checklist-scroll" role="region" aria-label="Academic course flowchart" tabIndex="0">
           <table className="checklist-table">
             <thead>
               <tr>
@@ -53,7 +68,7 @@ export function CheckListPage() {
               {Array.from({ length: rowCount }, (_, rowIndex) => (
                 <tr key={rowIndex}>
                   <th className="checklist-row-number" scope="row">{rowIndex + 1}</th>
-                  {activeCheckListTerms.map((term, termIndex) => {
+                  {terms.map((term, termIndex) => {
                     const course = term.courses[rowIndex];
                     if (!course) return <td className="checklist-empty-cell" key={`${termIndex}-${rowIndex}`} aria-hidden="true" />;
                     return (
@@ -75,7 +90,7 @@ export function CheckListPage() {
               ))}
             </tbody>
           </table>
-        </div>
+        </div>}
         <p className="checklist-source-note">Course-level earned units and grades are shown only where the supplied academic record includes them.</p>
       </Panel>
     </>
