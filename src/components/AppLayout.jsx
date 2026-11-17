@@ -6,6 +6,7 @@ import { StudentProfileContext } from "../contexts/StudentProfileContext.jsx";
 import HelpSupport from "./HelpSupport.jsx";
 import Icon from "./Icon.jsx";
 import { useActiveStudentAccount } from "../hooks/useActiveStudentAccount.js";
+import { useSessionStorage } from "../hooks/useSessionStorage.js";
 
 function NavLink({ id, label, icon, activePage, onNavigate, className = "" }) {
   const isActive = activePage === id;
@@ -24,7 +25,7 @@ function NavLink({ id, label, icon, activePage, onNavigate, className = "" }) {
 
 function NavigationGroup({ group, activePage, onNavigate }) {
   const isCurrent = activePage === group.id || group.children.some(([id]) => id === activePage);
-  const [expanded, setExpanded] = useState(isCurrent);
+  const [expanded, setExpanded] = useSessionStorage(`myau-nav-group-${group.id}`, isCurrent);
 
   useEffect(() => {
     if (isCurrent) setExpanded(true);

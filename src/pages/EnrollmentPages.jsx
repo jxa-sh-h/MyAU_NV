@@ -80,6 +80,7 @@ export function PersonalContent({ pageId }) {
   const [feedback, setFeedback] = useState("");
   const [loading, setLoading] = useState(false);
   const { profile, setProfile } = useStudentProfile();
+  const isDemoAccount = profile.id === "00-0000-00";
   if (pageId === "personal-information") {
     return <Overview page={pages[pageId]} ids={["view-personal-info", "edit-personal-info", "print-personal-info", "change-password"]} />;
   }
@@ -102,12 +103,10 @@ export function PersonalContent({ pageId }) {
       <>
         <PageIntro page={pages[pageId]} />
         <Panel title="Personal information">
-          <div className="profile-view-heading">
-            {profile.id === "00-0000-00"
-              ? <span className="profile-photo profile-demo-photo" aria-hidden="true">DA</span>
-              : <img className="profile-photo" src="/submitted-requirements/2x2.png" alt="Student profile" />}
-            <p>{profile.id === "00-0000-00" ? "Demo profile avatar" : "Student profile photo"}</p>
-          </div>
+          {!isDemoAccount && <div className="profile-view-heading">
+            <img className="profile-photo" src="/submitted-requirements/2x2.png" alt="Student profile" />
+            <p>Student profile photo</p>
+          </div>}
           <DataTable headers={["Information", "Details"]} rows={profileRows} label="Personal information" />
           <Link className="button button-primary personal-edit-button" to="/index.html#edit-personal-info">Edit personal information</Link>
         </Panel>
@@ -139,11 +138,11 @@ export function PersonalContent({ pageId }) {
         <section className="panel form-panel">
           <div className="panel-header"><div><h2>Student profile and contact information</h2><p>Student identity details are fixed. Update your address and contact information below.</p></div></div>
           <form className="demo-form profile-form" onSubmit={savePersonalInfo}>
-            <section className="profile-overview" aria-label="Student profile">
-              <div className="profile-photo-wrap">
+            <section className={`profile-overview${isDemoAccount ? " profile-overview-no-photo" : ""}`} aria-label="Student profile">
+              {!isDemoAccount && <div className="profile-photo-wrap">
                 <img className="profile-photo" src="/submitted-requirements/2x2.png" alt="Student profile" />
                 <span>2 × 2 profile photo</span>
-              </div>
+              </div>}
               <div className="profile-overview-details">
                 <h3>Fixed student information</h3>
                 <div className="profile-fixed-grid">
