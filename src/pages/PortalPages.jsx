@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   academicSections,
@@ -62,24 +62,26 @@ function Dashboard() {
     || activeClearances.length > 0
     || activeCirculation.some(([item, value]) => /overdue|fine/i.test(item) && !/^₱?0(?:\.00)?$/.test(value.trim()));
   const mascotMessages = [
-    { image: "msacot_greetings.png", alt: "The AUF dog mascot greeting students", kicker: "Your AUF companion", title: "Welcome back, Angelenean!", message: "Ready to check your classes, campus updates, and next steps?", action: "View my enrollment", to: "/index.html#subjects-enrolled" },
-    { image: "mascot_happy.png", alt: "The AUF dog mascot smiling brightly", kicker: "Keep up the good work", title: "You’re making progress!", message: "Your steady effort adds up. Take the semester one task at a time.", action: "View my enrollment", to: "/index.html#subjects-enrolled" },
-    { image: "mascot_standing.png", alt: "The AUF dog mascot standing at attention", kicker: "Ready for your next step?", title: "Check your academic progress.", message: "Review your records and ask your faculty adviser about support when you need it.", action: "Academic records", to: "/index.html#academic-performance" },
-    { image: "mascot_resting.png", alt: "The AUF dog mascot taking a nap", kicker: "A gentle reminder", title: "Take a breather.", message: "A short rest can help you return to your next task with fresh focus.", action: "View my enrollment", to: "/index.html#subjects-enrolled" },
-    { image: "mascot_wink.png", alt: "The AUF dog mascot winking", kicker: "You’ve got this", title: "One step at a time.", message: "Need to share feedback about a class? The evaluation form is ready when you are.", action: "Evaluate a class", to: "/pages/faculty-evaluation.html" },
+    { image: "msacot_greetings.png", alt: "The AUF dog mascot greeting students", kicker: "Your AUF companion", title: "Welcome back, Angelenean!", message: "Your dashboard brings campus updates, classes, and account details together.", action: "View my dashboard", to: "/index.html#dashboard" },
+    { image: "mascot_happy.png", alt: "The AUF dog mascot smiling brightly", kicker: "Keep up the good work", title: "Every course counts.", message: "Review your academic progress and celebrate the effort behind each result.", action: "View academic records", to: "/index.html#academic-performance" },
+    { image: "mascot_movingforward.png", alt: "The AUF dog mascot moving forward", kicker: "Ready for your next step?", title: "Keep moving forward.", message: "Checking grades, completing requirements, and asking for support all move you toward your goals.", action: "Academic records", to: "/index.html#academic-performance" },
+    { image: "mascot_resting.png", alt: "The AUF dog mascot taking a nap", kicker: "A gentle reminder", title: "Take a breather.", message: "Pause between study sessions, then return to your course plan when you feel ready.", action: "View my courses", to: "/index.html#subjects-enrolled" },
+    { image: "mascot_wink.png", alt: "The AUF dog mascot winking", kicker: "Your voice matters", title: "Share your class feedback.", message: "Tell the university about your learning experience through Faculty Evaluation.", action: "Evaluate a class", to: "/pages/faculty-evaluation.html" },
     hasPendingClearance
-      ? { image: "mscot_notice.png", alt: "The AUF dog mascot showing a reminder", kicker: "Clearance reminder", title: "There are items to review.", message: "Open Student Clearance to check your pending payment, library, or conduct requirements.", action: "Open clearance", to: "/index.html#student-clearance" }
-      : { image: "mascot_happy.png", alt: "The AUF dog mascot smiling", kicker: "Clearance update", title: "You’re all clear!", message: "There are no pending clearance items in your account.", action: "View my enrollment", to: "/index.html#subjects-enrolled" },
+      ? { image: "mscot_notice.png", alt: "The AUF dog mascot showing a reminder", kicker: "Clearance reminder", title: "Review your clearance.", message: "Check Student Clearance for any pending payment, library, or conduct requirements.", action: "Open clearance", to: "/index.html#student-clearance" }
+      : { image: "mascot_asking.png", alt: "The AUF dog mascot asking a question", kicker: "Clearance update", title: "Your clearance is complete.", message: "You have no pending clearance items right now. Check back when you prepare to enroll.", action: "View clearance", to: "/index.html#student-clearance" },
   ];
   const [mascotIndex, setMascotIndex] = useState(0);
+  const [mascotHovered, setMascotHovered] = useState(false);
+  const [mascotFocused, setMascotFocused] = useState(false);
   const mascot = mascotMessages[mascotIndex];
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
+    if (mascotHovered || mascotFocused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
     const timer = window.setInterval(() => {
       setMascotIndex((index) => (index + 1) % mascotMessages.length);
     }, 7000);
     return () => window.clearInterval(timer);
-  }, [mascotMessages.length]);
+  }, [mascotMessages.length, mascotHovered, mascotFocused]);
   const clearanceCard = hasPendingClearance ? (
     <Link className="summary-card" to="/index.html#student-clearance">
       <span className="summary-icon amber"><Icon name="check" /></span>
@@ -96,14 +98,23 @@ function Dashboard() {
       <PageHeading page={{ section: "Student Portal", title: "Welcome back", description: "Here’s your academic snapshot and the latest campus updates." }}>
         <div className="date-label"><Icon name="calendar" /><time>{today}</time></div>
       </PageHeading>
-      <section className="hero" aria-labelledby="hero-title">
+      <section
+        className="hero"
+        aria-labelledby="hero-title"
+        onMouseEnter={() => setMascotHovered(true)}
+        onMouseLeave={() => setMascotHovered(false)}
+        onFocus={() => setMascotFocused(true)}
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget)) setMascotFocused(false);
+        }}
+      >
         <div className="hero-content">
           <p className="hero-kicker">{mascot.kicker}</p><h2 id="hero-title">{mascot.title}</h2>
           <p id="mascot-message" aria-live="off">{mascot.message}</p>
           <Link className="button button-light" to={mascot.to}>{mascot.action} <Icon name="arrow" /></Link>
         </div>
         <div className="hero-art mascot-art" aria-hidden="true">
-          <img className="mascot-image" key={`${mascot.image}-${mascot.title}`} src={`/img/mascot/${mascot.image}`} alt="" />
+          <img className={`mascot-image${mascot.image === "mascot_resting.png" ? " mascot-image-resting" : ""}`} key={`${mascot.image}-${mascot.title}`} src={`/img/mascot/${mascot.image}`} alt="" />
         </div>
       </section>
       <div className="summary-grid">
@@ -505,35 +516,49 @@ function CheckListPage() {
 }
 
 function GradingPage() {
-  const [examPeriod, setExamPeriod] = useState("Prelim");
-  const [term, setTerm] = useState("1st Semester");
-  const [startYear, setStartYear] = useState("2026");
-  const [endYear, setEndYear] = useState("2027");
-  const [showGrades, setShowGrades] = useState(false);
+  const [examPeriod, setExamPeriod] = useState("Final");
+  const [term, setTerm] = useState("2nd Semester");
+  const [schoolYear, setSchoolYear] = useState("2025-2026");
   const { profile, subjects: activeSubjects, gradingRecords: activeGrades } = usePortalData();
-  const hasTermRecords = term === "1st Semester" && startYear === "2026" && endYear === "2027";
-  const grades = hasTermRecords ? activeSubjects.map(([code, title, , credit]) => {
-    const record = activeGrades.find((item) => item.code === code);
-    const grade = examPeriod === "Midterm" ? record?.midtermGrade ?? "Not posted" : "Not posted";
-    return {
-      code,
-      title,
-      credit,
-      instructor: record?.instructor ?? "Faculty member",
-      grade,
-      remarks: examPeriod === "Midterm" ? "Passed" : "—",
-      isEncoded: examPeriod === "Midterm",
-    };
-  }) : [];
+  const schoolYearLabel = schoolYear.replace("-", "–");
+  const historicalYearLevel = schoolYear === "2024-2025" ? "1st Year" : schoolYear === "2025-2026" ? "2nd Year" : null;
+  const historicalTerm = checkListTerms.find((record) => record.year === historicalYearLevel && record.semester === term);
+  const grades = historicalYearLevel && ["Midterm", "Final"].includes(examPeriod)
+    ? (historicalTerm?.courses ?? []).filter((course) => course.grade !== undefined).map((course) => ({
+      code: course.code,
+      title: course.title,
+      credit: course.units.toFixed(1),
+      instructor: "—",
+      grade: String(course.grade),
+      remarks: course.status === "passed" ? "Passed" : "—",
+      isEncoded: true,
+    }))
+    : schoolYear === "2026-2027" && term === "1st Semester"
+      ? activeSubjects.map(([code, title, , credit]) => {
+        const record = activeGrades.find((item) => item.code === code);
+        const grade = examPeriod === "Midterm" ? record?.midtermGrade ?? "Not posted" : "Not posted";
+        return {
+          code,
+          title,
+          credit,
+          instructor: record?.instructor ?? "Faculty member",
+          grade,
+          remarks: examPeriod === "Midterm" ? "Passed" : "—",
+          isEncoded: examPeriod === "Midterm",
+        };
+      })
+      : [];
 
   function updateExamPeriod(event) {
     setExamPeriod(event.target.value);
-    setShowGrades(false);
   }
 
   function updateTerm(event) {
     setTerm(event.target.value);
-    setShowGrades(false);
+  }
+
+  function updateSchoolYear(event) {
+    setSchoolYear(event.target.value);
   }
 
   return (
@@ -547,7 +572,7 @@ function GradingPage() {
           <div><dt>Course/Major</dt><dd>{profile.program}</dd></div>
           <div><dt>Year</dt><dd>{profile.yearLevel}</dd></div>
         </dl>
-        <form className="grading-controls" onSubmit={(event) => { event.preventDefault(); setShowGrades(true); }}>
+        <div className="grading-controls">
           <label htmlFor="grading-exam-period">Show</label>
           <select id="grading-exam-period" value={examPeriod} onChange={updateExamPeriod}>
             <option>Prelim</option>
@@ -561,45 +586,44 @@ function GradingPage() {
             <option>Summer</option>
           </select>
           <div className="grading-school-year">
-            <label htmlFor="grading-start-year">SY:</label>
-            <input id="grading-start-year" aria-label="School year start" inputMode="numeric" maxLength="4" value={startYear} onChange={(event) => { setStartYear(event.target.value); setShowGrades(false); }} />
-            <span>to</span>
-            <input aria-label="School year end" inputMode="numeric" maxLength="4" value={endYear} onChange={(event) => { setEndYear(event.target.value); setShowGrades(false); }} />
+            <label htmlFor="grading-school-year">SY:</label>
+            <select id="grading-school-year" value={schoolYear} onChange={updateSchoolYear}>
+              <option value="2024-2025">2024–2025</option>
+              <option value="2025-2026">2025–2026</option>
+              <option value="2026-2027">2026–2027</option>
+            </select>
           </div>
-          <button className="grading-view-button" type="submit">View grades</button>
-        </form>
-        {showGrades && (
-          <section className="grading-results" aria-live="polite">
-            <p className="grading-note">Gold-highlighted grades have not been verified by the registrar. “Not posted” means no grade is shown.</p>
-            <h3>{examPeriod} Grades · {term} · {startYear}–{endYear}</h3>
-            {grades.length === 0 ? <p className="empty-state">No grade records are available for {term}, {startYear}–{endYear}.</p> : <div className="grading-table-scroll" role="region" aria-label={`${examPeriod} grades for ${term}, ${startYear}-${endYear}`} tabIndex="0">
-              <table className="grading-table">
-                <thead>
-                  <tr>
-                    <th scope="col">Subject Code</th>
-                    <th scope="col">Subject Name</th>
-                    <th scope="col">Credit</th>
-                    <th scope="col">Instructor</th>
-                    <th scope="col">Grade</th>
-                    <th scope="col">Remarks</th>
+        </div>
+        <section className="grading-results" aria-live="polite">
+          <p className="grading-note">Gold-highlighted grades have not been verified by the registrar. “Not posted” means no grade is shown.</p>
+          <h3>{examPeriod} Grades · {term} · {schoolYearLabel}</h3>
+          {grades.length === 0 ? <p className="empty-state">No grade records are available for {term}, {schoolYearLabel}.</p> : <div className="grading-table-scroll" role="region" aria-label={`${examPeriod} grades for ${term}, ${schoolYear}`} tabIndex="0">
+            <table className="grading-table">
+              <thead>
+                <tr>
+                  <th scope="col">Subject Code</th>
+                  <th scope="col">Subject Name</th>
+                  <th scope="col">Credit</th>
+                  <th scope="col">Instructor</th>
+                  <th scope="col">Grade</th>
+                  <th scope="col">Remarks</th>
+                </tr>
+              </thead>
+              <tbody>
+                {grades.map((grade) => (
+                  <tr key={grade.code}>
+                    <td>{grade.code}</td>
+                    <td>{grade.title}</td>
+                    <td>{grade.credit}</td>
+                    <td>{grade.instructor}</td>
+                    <td className={grade.isEncoded ? "grade-unverified" : "grade-not-encoded"}>{grade.grade}</td>
+                    <td className={grade.isEncoded ? "grade-unverified" : "grade-not-encoded"}>{grade.remarks}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {grades.map((grade) => (
-                    <tr key={grade.code}>
-                      <td>{grade.code}</td>
-                      <td>{grade.title}</td>
-                      <td>{grade.credit}</td>
-                      <td>{grade.instructor}</td>
-                      <td className={grade.isEncoded ? "grade-unverified" : "grade-not-encoded"}>{grade.grade}</td>
-                      <td className={grade.isEncoded ? "grade-unverified" : "grade-not-encoded"}>{grade.remarks}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>}
-          </section>
-        )}
+                ))}
+              </tbody>
+            </table>
+          </div>}
+        </section>
       </section>
     </>
   );
@@ -808,6 +832,73 @@ function LibraryContent() {
   );
 }
 
+const documentSections = [
+  {
+    title: "Guides",
+    documents: [
+      { name: "Payment Guide", description: "Instructions for reviewing payment options and completing student account payments.", file: "/payment_instruction.pdf" },
+    ],
+  },
+  {
+    title: "Manuals",
+    documents: [
+      { name: "AUF College Student Handbook", description: "Angeles University Foundation College Student Handbook, 2026 edition.", file: "/AUF%20COLLEGE%20STUDENT%20HANDBOOK%202026-FINAL%20DIGITAL%20COPY.pdf" },
+    ],
+  },
+  {
+    title: "Forms",
+    documents: [
+      { name: "Incomplete Grades Form", description: "Form to be accomplished for incomplete grades.", file: "/documents/incomplete-grades-form-placeholder.html" },
+      { name: "Load Revision Form", description: "Form to be accomplished for load revision.", file: "/documents/load-revision-form-placeholder.html" },
+      { name: "Transfer Form", description: "Form to be accomplished for transferring.", file: "/documents/transfer-form-placeholder.html" },
+    ],
+  },
+];
+
+function DocumentsContent() {
+  const [previewFile, setPreviewFile] = useState(null);
+
+  return (
+    <>
+      <PageIntro page={pages.documents} />
+      {documentSections.map(({ title, documents }) => (
+        <Panel key={title} title={title}>
+          <div className="table-scroll">
+            <table className="documents-table">
+              <thead>
+                <tr><th scope="col">Name</th><th scope="col">Description</th><th scope="col">Actions</th></tr>
+              </thead>
+              <tbody>
+                {documents.map((document) => (
+                  <Fragment key={document.name}>
+                    <tr>
+                      <td><strong>{document.name}</strong></td>
+                      <td>{document.description}</td>
+                      <td className="documents-actions">
+                        <button className="text-button" type="button" aria-expanded={previewFile === document.file} onClick={() => setPreviewFile((current) => current === document.file ? null : document.file)}>
+                          {previewFile === document.file ? "Hide preview" : "Preview"}
+                        </button>
+                        <a className="text-button" href={document.file} download>Download</a>
+                      </td>
+                    </tr>
+                    {previewFile === document.file && (
+                      <tr>
+                        <td className="documents-preview-cell" colSpan="3">
+                          <iframe className="documents-preview" src={document.file} title={`${document.name} preview`} />
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Panel>
+      ))}
+    </>
+  );
+}
+
 const evaluationSections = [
   { title: "Instructional Management", questions: [
     "Our instructor informs us of the session objectives.", "Our instructor discusses lessons in a systematic and coherent manner.", "Our instructor provides opportunities for active participation in class.", "Our instructor asks relevant questions about the lesson.", "Our instructor responds to questions and comments by clarifying or summarizing the key points.", "Our instructor uses relevant and engaging materials and resources.", "Our instructor uses real-life examples when appropriate.", "Our instructor connects the current lesson to previous lessons or other courses.", "Our instructor uses assessments that let us demonstrate our understanding and application of course content.", "Our instructor gives us a reasonable amount of time to complete tasks.", "Our instructor uses English as the language of instruction.", "Our instructor sustains our attention and interest in lessons.", "Our instructor designs learning activities that encourage curiosity.", "Our instructor designs learning activities that stimulate critical thinking.", "Our instructor makes effective use of resources and tools for the course format (online, hybrid, or in person).", "Our instructor uses varied materials and strategies in course discussions (for example, videos, demonstrations, lectures, podcasts, and group work).", "Our instructor publishes course modules on time.", "Our instructor provides meaningful, constructive feedback within a reasonable time.",
@@ -915,7 +1006,7 @@ function PaymentPage() {
   return (
     <main className="payment-standalone" aria-label="Online payment">
       <header className="payment-standalone-header">
-        <Link className="payment-brand" to="/index.html#dashboard"><span>AUF</span><strong>MyAU Pay</strong></Link>
+        <Link className="payment-brand" to="/index.html#dashboard"><img className="payment-brand-logo" src="/img/MYAU_logo.png" alt="" aria-hidden="true" /><strong>MyAU Pay</strong></Link>
         <Link className="payment-return" to="/index.html#dashboard">Back to portal <Icon name="arrow" /></Link>
       </header>
       <div className="payment-standalone-content">
@@ -971,6 +1062,7 @@ export default function PortalPage({ pageId }) {
   if (["enrollment", "subjects-enrolled", "fees-paid-during-enrollment", "submit-admission-requirement", "student-account", "ledger", "periodic-dues"].includes(pageId)) return <EnrollmentPage pageId={pageId} />;
   if (["academic-performance", "non-acad-performance", ...academicSections.map(({ id }) => id), ...nonAcademicSections.map(({ id }) => id)].includes(pageId)) return <AcademicPage pageId={pageId} />;
   if (["personal-information", "view-personal-info", "edit-personal-info", "print-personal-info", "change-password"].includes(pageId)) return <PersonalContent pageId={pageId} />;
+  if (pageId === "documents") return <DocumentsContent />;
   if (pageId === "library") return <LibraryContent />;
   if (pageId === "faculty-evaluation") return <FacultyEvaluation />;
   if (pageId === "online-payment") return <PaymentPage />;

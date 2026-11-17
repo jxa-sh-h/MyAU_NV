@@ -4,6 +4,7 @@ import { navigationGroups, pages, standalonePages, student, subjects } from "../
 import { useLocalStorage } from "../hooks/useLocalStorage.js";
 import { StudentProfileContext } from "../contexts/StudentProfileContext.jsx";
 import { demoAccounts } from "../data/demoAccounts.js";
+import HelpSupport from "./HelpSupport.jsx";
 import Icon from "./Icon.jsx";
 
 function routeFor(id) {
@@ -82,6 +83,7 @@ export default function AppLayout({ activePage, children }) {
   const [profile, setProfile] = useLocalStorage(profileStorageKey, account.profile ?? { ...student, email: "", contactMobile: "" });
   const activeSubjects = account.subjects ?? subjects;
   const menuButtonRef = useRef(null);
+  const sidebarRef = useRef(null);
   const active = pages[activePage] ?? pages.dashboard;
 
   useEffect(() => {
@@ -99,8 +101,44 @@ export default function AppLayout({ activePage, children }) {
     return () => document.removeEventListener("keydown", handleEscape);
   }, [menuOpen]);
 
+  useEffect(() => {
+    if (!menuOpen) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    const updateScrollLock = () => {
+      document.body.style.overflow = window.matchMedia("(max-width: 760px)").matches ? "hidden" : previousOverflow;
+    };
+    updateScrollLock();
+    sidebarRef.current?.querySelector(".sidebar-brand")?.focus();
+    window.addEventListener("resize", updateScrollLock);
+    return () => {
+      window.removeEventListener("resize", updateScrollLock);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [menuOpen]);
+
   function closeMenu() {
     setMenuOpen(false);
+    menuButtonRef.current?.focus();
+  }
+
+  function trapSidebarFocus(event) {
+    if (event.key !== "Tab" || !menuOpen || !window.matchMedia("(max-width: 760px)").matches) return;
+    const focusable = [...(sidebarRef.current?.querySelectorAll('a[href], button:not([disabled]), summary') ?? [])]
+      .filter((element) => (
+        element.getClientRects().length > 0
+        && getComputedStyle(element).visibility !== "hidden"
+        && (element.matches("summary") || !element.closest("details:not([open])"))
+      ));
+    if (focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
   }
 
   function logout() {
@@ -115,10 +153,10 @@ export default function AppLayout({ activePage, children }) {
         <button id="menu-toggle" ref={menuButtonRef} className="icon-button menu-toggle" type="button" aria-label={menuOpen ? "Close navigation" : "Open navigation"} aria-expanded={menuOpen} aria-controls="sidebar" onClick={() => setMenuOpen((value) => !value)}>
           <Icon name={menuOpen ? "close" : "menu"} />
         </button>
-        {menuOpen && <button className="sidebar-scrim" type="button" aria-label="Close navigation" onClick={closeMenu} />}
-        <aside className={`sidebar${menuOpen ? " is-open" : ""}`} id="sidebar" aria-label="Main navigation">
+        {menuOpen && <button className="sidebar-scrim" type="button" aria-label="Close navigation" tabIndex="-1" onClick={closeMenu} />}
+        <aside ref={sidebarRef} className={`sidebar${menuOpen ? " is-open" : ""}`} id="sidebar" aria-label="Main navigation" onKeyDown={trapSidebarFocus}>
           <Link className="sidebar-brand" to="/index.html#dashboard" onClick={closeMenu} aria-label="MyAU Student Portal home">
-            <span className="sidebar-brand-mark" aria-hidden="true">AUF</span>
+            <img className="sidebar-brand-logo" src="/img/MYAU_logo.png" alt="" aria-hidden="true" />
             <span><strong>MyAU</strong><small>STUDENT PORTAL</small></span>
           </Link>
           <StudentPanel profile={profile} onLogout={logout} />
@@ -128,18 +166,9 @@ export default function AppLayout({ activePage, children }) {
             {navigationGroups.slice(0, 4).map((group) => <NavigationGroup key={group.id} group={group} activePage={activePage} onNavigate={closeMenu} />)}
             {standalonePages.map(([id, label, icon]) => <NavLink key={id} id={id} label={label} icon={icon} activePage={activePage} onNavigate={closeMenu} />)}
           </nav>
-          <details className="sidebar-footer sidebar-help">
-            <summary>
-              <span className="help-icon" aria-hidden="true">?</span>
-              <span className="sidebar-help-title"><strong>Need help?</strong><span>Support and quick links</span></span>
-            </summary>
-            <div className="sidebar-help-links">
-              <Link to="/index.html#student-clearance" onClick={closeMenu}>Student Services and clearance</Link>
-              <Link to="/index.html#edit-personal-info" onClick={closeMenu}>Update personal information</Link>
-              <a href="mailto:mailadmin@auf.edu.ph">MyAU Mail support</a>
-              <a href="mailto:myclass@auf.edu.ph">MyClass support</a>
-            </div>
-          </details>
+          <div className="sidebar-footer sidebar-help">
+            <HelpSupport variant="sidebar" />
+          </div>
         </aside>
         <main className="main-content" id="main-content" tabIndex="-1">
           <div id="page-content" aria-live="polite">{children}</div>

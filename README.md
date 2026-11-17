@@ -30,4 +30,4 @@ The root URL opens the sign-in screen. It validates the configured account and o
 
 ## Page structure
 
-The portal sections all use `index.html` and are selected using its URL hash. The root login screen is a React route and does not add another HTML page. The standalone HTML pages are `pages/library.html`, `pages/faculty-evaluation.html`, and `pages/online-payment.html`. The former `pages/ebsco-database.html` entry point redirects to the combined Library page. Keep this structure unchanged unless a page or section change is explicitly requested.
+The portal sections all use `index.html` and are selected using its URL hash. The root login screen is a React route and does not add another HTML page. The standalone HTML pages are `pages/documents.html`, `pages/library.html`, `pages/faculty-evaluation.html`, and `pages/online-payment.html`. The former `pages/ebsco-database.html` entry point redirects to the combined Library page. Keep this structure unchanged unless a page or section change is explicitly requested.

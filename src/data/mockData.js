@@ -29,6 +29,7 @@ export const pages = {
   "edit-personal-info": { title: "Edit Personal Information", section: "Personal Information", description: "Update your address and contact information." },
   "print-personal-info": { title: "Print Personal Information", section: "Personal Information", description: "Print the current profile information." },
   "change-password": { title: "Change Password", section: "Personal Information", description: "Enter and confirm a new password." },
+  documents: { title: "Documents", section: "Student Resources", description: "Browse guides, manuals, and student forms." },
   library: { title: "Library", section: "Library Services", description: "Explore library services and research resources." },
   "faculty-evaluation": { title: "Faculty Evaluation", section: "Student Services", description: "Share feedback on your classes." },
   "online-payment": { title: "Online Payment", section: "Student Account", description: "Review your account balance and payment options." },
@@ -80,6 +81,7 @@ export const navigationGroups = [
 ];
 
 export const standalonePages = [
+  ["documents", "Documents", "file", "/pages/documents.html"],
   ["library", "Library", "book", "/pages/library.html"],
   ["faculty-evaluation", "Faculty Evaluation", "star", "/pages/faculty-evaluation.html"],
   ["online-payment", "Online Payment", "wallet", "/pages/online-payment.html"],
@@ -156,7 +158,7 @@ export const checkListTerms = [
       { code: "PEF1", title: "Physical Activity Towards Health and Fitness 1 (PATH-Fit 1)", units: 2, earnedUnits: 2, grade: 99, status: "passed" },
       { code: "PROLOD", title: "Programming Logic and Design", units: 2, earnedUnits: 2, grade: 90, status: "passed" },
       { code: "RPH", title: "Readings in Philippine History", units: 3, earnedUnits: 3, grade: 93, status: "passed" },
-      { code: "SSELEC", title: "Social Sciences Elective", units: 3, earnedUnits: 3, grade: 97, status: "passed" },
+      { code: "SSELECT", title: "Social Sciences Elective", units: 3, earnedUnits: 3, grade: 97, status: "passed" },
     ],
   },
   {
@@ -181,14 +183,14 @@ export const checkListTerms = [
     year: "2nd Year",
     semester: "1st Semester",
     requiredUnits: 24,
-    creditedUnits: 18,
+    creditedUnits: 24,
     courses: [
-      { code: "AITAPP", title: "Art Appreciation", units: 3, status: "credit-short" },
+      { code: "ARTAP", title: "Art Appreciation", units: 3, earnedUnits: 3, grade: 92, status: "passed" },
       { code: "COMPAD", title: "Computer-Aided Drafting", units: 1, earnedUnits: 1, grade: 98, status: "passed" },
       { code: "DASTAL", title: "Data Structure and Algorithm", units: 2, earnedUnits: 2, grade: 94, status: "passed" },
       { code: "DIFFEQ", title: "Differential Equations", units: 3, earnedUnits: 3, grade: 87, status: "passed" },
       { code: "EECIRC", title: "Fundamentals of Electrical Circuits", units: 4, earnedUnits: 4, grade: 86, status: "passed" },
-      { code: "ENECOM", title: "Engineering Economics", units: 3, status: "credit-short" },
+      { code: "ENECON", title: "Engineering Economics", units: 3, earnedUnits: 3, grade: 90, status: "passed" },
       { code: "PCOM", title: "Purposive Communication", units: 3, earnedUnits: 3, grade: 94, status: "passed" },
       { code: "PEF3", title: "Physical Activity Towards Health and Fitness 3 (PATH-Fit 3)", units: 2, earnedUnits: 2, grade: 95, status: "passed" },
       { code: "RRES", title: "Religions, Religious Experiences and Spirituality", units: 3, earnedUnits: 3, grade: 92, status: "passed" },
@@ -198,11 +200,11 @@ export const checkListTerms = [
     year: "2nd Year",
     semester: "2nd Semester",
     requiredUnits: 25,
-    creditedUnits: 21,
+    creditedUnits: 25,
     courses: [
       { code: "CISCO1", title: "CISCO 1", units: 3, earnedUnits: 3, grade: 93, status: "passed" },
       { code: "CW", title: "The Contemporary World", units: 3, earnedUnits: 3, grade: 96, status: "passed" },
-      { code: "FECIRC", title: "Fundamentals of Electronic Circuits", units: 4, status: "credit-short" },
+      { code: "ECECIR", title: "Fundamentals of Electronic Circuits", units: 4, earnedUnits: 4, grade: 97, status: "passed" },
       { code: "ETHICS", title: "Ethics", units: 3, earnedUnits: 3, grade: 85, status: "passed" },
       { code: "NUMMET", title: "Numerical Methods", units: 3, earnedUnits: 3, grade: 98, status: "passed" },
       { code: "PEF4", title: "Physical Activity Towards Health and Fitness 4 (PATH-Fit 4)", units: 2, earnedUnits: 2, grade: 97, status: "passed" },
@@ -273,12 +275,12 @@ export const checkListTerms = [
 
 export const academicSections = [
   { id: "check-list", title: "Course Checklist", description: pages["check-list"].description },
-  { id: "academic-awards-achievements", title: "Awards/Achievements", description: pages["academic-awards-achievements"].description, rows: [["Dean’s List", "2nd Semester · AY 2025–2026"], ["Programming Challenge finalist", "College level · 2025"]] },
+  { id: "academic-awards-achievements", title: "Awards/Achievements", description: pages["academic-awards-achievements"].description, rows: [["College Scholar", "1st Year · 2nd Semester"], ["College Scholar", "2nd Year · 1st Semester"], ["College Scholar", "2nd Year · 2nd Semester"]] },
   { id: "grading-per-exam-period", title: "Grading Per Exam Period", description: pages["grading-per-exam-period"].description, rows: [["Preliminary", "88.4"], ["Midterm", "90.1"], ["Final", "Pending"]] },
 ];
 
 export const nonAcademicSections = [
-  { id: "membership", title: "Membership", description: pages.membership.description, rows: [["AUF Computer Engineering Society", "Active member"], ["Campus Robotics Circle", "Participant"]] },
+  { id: "membership", title: "Membership", description: pages.membership.description, rows: [["Institute of Computer Engineers of the Philippines - AUF Chapter (ICpEP)", "2024 to current"], ["AUF Association of DOST Scholars", "2024"], ["Pioneer", "2024–2026"]] },
   { id: "non-acad-awards-achievements", title: "Awards/Achievements", description: pages["non-acad-awards-achievements"].description, rows: [["Inter-college robotics showcase", "Participant · 2026"], ["Student volunteer appreciation", "Recognition · 2025"]] },
 ];
 

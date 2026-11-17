@@ -7,6 +7,7 @@ export default defineConfig({
     rollupOptions: {
       input: [
         "index.html",
+        "pages/documents.html",
         "pages/library.html",
         "pages/ebsco-database.html",
         "pages/faculty-evaluation.html",
