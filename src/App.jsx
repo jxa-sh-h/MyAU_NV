@@ -4,14 +4,14 @@ import AppLayout from "./components/AppLayout.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import PortalPage from "./pages/PortalPages.jsx";
 import { pages, standalonePages } from "./data/mockData.js";
-import { useLocalStorage } from "./hooks/useLocalStorage.js";
+import { useSessionStorage } from "./hooks/useSessionStorage.js";
 
 const standaloneIds = new Set(standalonePages.map(([id]) => id));
 
 function PortalRoute() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [session] = useLocalStorage("myau-demo-session", null);
+  const [session] = useSessionStorage("myau-demo-session", null);
   const requestedPage = location.hash.slice(1) || "dashboard";
   const isLegacyDisciplineRoute = requestedPage === "discipline-monitoring";
   const isLegacyEbscoRoute = requestedPage === "ebsco-database";
@@ -41,7 +41,7 @@ function PortalRoute() {
 }
 
 function StandaloneRoute({ pageId }) {
-  const [session] = useLocalStorage("myau-demo-session", null);
+  const [session] = useSessionStorage("myau-demo-session", null);
   if (!session) return <Navigate to="/login" replace />;
   if (pageId === "online-payment") return <PortalPage pageId={pageId} />;
   return (

@@ -18,6 +18,7 @@ import {
   subjects,
 } from "../data/mockData.js";
 import { useLocalStorage } from "../hooks/useLocalStorage.js";
+import { useSessionStorage } from "../hooks/useSessionStorage.js";
 import { useStudentProfile } from "../contexts/StudentProfileContext.jsx";
 import { demoAccounts } from "../data/demoAccounts.js";
 import Icon from "../components/Icon.jsx";
@@ -974,7 +975,7 @@ function FacultyEvaluation() {
 }
 
 function PaymentPage() {
-  const [session] = useLocalStorage("myau-demo-session", null);
+  const [session] = useSessionStorage("myau-demo-session", null);
   const account = demoAccounts.find((item) => item.username === session?.username) ?? demoAccounts[0];
   const profileStorageKey = "myau-personal-info-AUFAGUIRRE15-v2";
   const [profile] = useLocalStorage(profileStorageKey, account.profile);

@@ -6,6 +6,7 @@ import { StudentProfileContext } from "../contexts/StudentProfileContext.jsx";
 import { demoAccounts } from "../data/demoAccounts.js";
 import HelpSupport from "./HelpSupport.jsx";
 import Icon from "./Icon.jsx";
+import { useSessionStorage } from "../hooks/useSessionStorage.js";
 
 function routeFor(id) {
   const standalone = standalonePages.find(([pageId]) => pageId === id);
@@ -77,7 +78,7 @@ function StudentPanel({ profile, onLogout }) {
 export default function AppLayout({ activePage, children }) {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [session, setSession] = useLocalStorage("myau-demo-session", null);
+  const [session, setSession] = useSessionStorage("myau-demo-session", null);
   const account = demoAccounts.find((item) => item.username === session?.username) ?? demoAccounts[0];
   const profileStorageKey = "myau-personal-info-AUFAGUIRRE15-v2";
   const [profile, setProfile] = useLocalStorage(profileStorageKey, account.profile ?? { ...student, email: "", contactMobile: "" });

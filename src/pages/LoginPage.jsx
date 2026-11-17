@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import HelpSupport from "../components/HelpSupport.jsx";
 import Icon from "../components/Icon.jsx";
 import { findDemoAccount } from "../data/demoAccounts.js";
-import { useLocalStorage } from "../hooks/useLocalStorage.js";
+import { useSessionStorage } from "../hooks/useSessionStorage.js";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -12,7 +12,7 @@ export default function LoginPage() {
   const [messageTone, setMessageTone] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [demoNotice, setDemoNotice] = useState(null);
-  const [, setSession] = useLocalStorage("myau-demo-session", null);
+  const [, setSession] = useSessionStorage("myau-demo-session", null);
 
   useEffect(() => {
     if (acknowledged && !demoNotice) return undefined;
