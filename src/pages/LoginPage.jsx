@@ -51,7 +51,7 @@ export default function LoginPage() {
           <div className="login-card-heading">
             <span className="login-card-eyebrow">Welcome to MyAU</span>
             <h2 id="login-card-title">Sign in to continue</h2>
-            <p>For students and parents</p>
+            <p>Sign in with your AUF account.</p>
           </div>
           <form className="login-form" onSubmit={signIn}>
             <label htmlFor="login-username">Username</label>
@@ -64,17 +64,7 @@ export default function LoginPage() {
             <button className="login-submit" type="submit">Login</button>
           </form>
 
-          <button className="login-text-link login-forgot-link" type="button" onClick={() => setMessage("Password recovery is not available in this demo.")}>
-            Forgot password
-          </button>
           <p className={`login-message${messageTone ? ` ${messageTone}` : ""}`} id="login-feedback" role="status" aria-live="polite">{message}</p>
-          <div className="login-register">
-            <span>New to AUF?</span>
-            <button className="login-text-link" type="button" onClick={() => setMessage("New student registration is not available in this demo.")}>
-              Sign up here
-            </button>
-          </div>
-          <p className="login-demo-note">Simulated sign-in · No real account access</p>
         </section>
       </div>
     </main>

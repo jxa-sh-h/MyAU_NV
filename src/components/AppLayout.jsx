@@ -52,10 +52,11 @@ function NavigationGroup({ group, activePage, onNavigate }) {
 }
 
 function StudentPanel({ profile, onLogout }) {
+  const address = [profile.addressLine, profile.barangay, profile.city, profile.province].filter(Boolean).join(", ");
   return (
     <section className="student-panel" aria-label="Student information">
       <div className="student-panel-header">
-        <div className="avatar avatar-large">AJ</div>
+        <img className="avatar avatar-large avatar-photo" src="/submitted-requirements/2x2.png" alt="" />
         <div className="student-info"><span className="student-id">{profile.id}</span><strong title={profile.name}>{profile.name}</strong></div>
         <button className="logout-button" type="button" onClick={onLogout}>Logout</button>
       </div>
@@ -63,6 +64,9 @@ function StudentPanel({ profile, onLogout }) {
         <span><small>Academic year</small><strong>{profile.academicYear}</strong></span>
         <span><small>Year level</small><strong>{profile.yearLevel}</strong></span>
         <span><small>Program</small><strong>{profile.program}</strong></span>
+        <span><small>Email address</small><strong title={profile.email}>{profile.email || "Not provided"}</strong></span>
+        <span><small>Contact mobile</small><strong>{profile.contactMobile || "Not provided"}</strong></span>
+        <span><small>Address</small><strong title={address}>{address || "Not provided"}</strong></span>
       </div>
       <Link className="student-edit-link" to="/index.html#edit-personal-info">Edit personal information</Link>
     </section>
@@ -74,7 +78,7 @@ export default function AppLayout({ activePage, children }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [session, setSession] = useLocalStorage("myau-demo-session", null);
   const account = demoAccounts.find((item) => item.username === session?.username) ?? demoAccounts[0];
-  const profileStorageKey = account.username === "AUFAGUIRRE15" ? "myau-personal-info-AUFAGUIRRE15-v2" : "myau-personal-info-MYAUDEMO-v2";
+  const profileStorageKey = "myau-personal-info-AUFAGUIRRE15-v2";
   const [profile, setProfile] = useLocalStorage(profileStorageKey, account.profile ?? { ...student, email: "", contactMobile: "" });
   const activeSubjects = account.subjects ?? subjects;
   const menuButtonRef = useRef(null);
@@ -124,14 +128,22 @@ export default function AppLayout({ activePage, children }) {
             {navigationGroups.slice(0, 4).map((group) => <NavigationGroup key={group.id} group={group} activePage={activePage} onNavigate={closeMenu} />)}
             {standalonePages.map(([id, label, icon]) => <NavLink key={id} id={id} label={label} icon={icon} activePage={activePage} onNavigate={closeMenu} />)}
           </nav>
-          <div className="sidebar-footer">
-            <span className="help-icon" aria-hidden="true">?</span>
-            <span><strong>Need help?</strong><Link to="/index.html#student-clearance" onClick={closeMenu}>Student Services</Link></span>
-          </div>
+          <details className="sidebar-footer sidebar-help">
+            <summary>
+              <span className="help-icon" aria-hidden="true">?</span>
+              <span className="sidebar-help-title"><strong>Need help?</strong><span>Support and quick links</span></span>
+            </summary>
+            <div className="sidebar-help-links">
+              <Link to="/index.html#student-clearance" onClick={closeMenu}>Student Services and clearance</Link>
+              <Link to="/index.html#edit-personal-info" onClick={closeMenu}>Update personal information</Link>
+              <a href="mailto:mailadmin@auf.edu.ph">MyAU Mail support</a>
+              <a href="mailto:myclass@auf.edu.ph">MyClass support</a>
+            </div>
+          </details>
         </aside>
         <main className="main-content" id="main-content" tabIndex="-1">
           <div id="page-content" aria-live="polite">{children}</div>
-          <footer className="page-footer"><span>MyAU Student Portal <span className="footer-separator">·</span> Demonstration only</span><span>© 2026 Angeles University Foundation</span></footer>
+          <footer className="page-footer"><span>MyAU Student Portal</span><span>© 2026 Angeles University Foundation</span></footer>
         </main>
       </div>
     </StudentProfileContext.Provider>

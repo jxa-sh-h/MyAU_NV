@@ -34,11 +34,6 @@ export function Badge({ children, tone = "success" }) {
   return <span className={`badge ${toneClass}`}>{children}</span>;
 }
 
-export function DemoNote({ children }) {
-  if (!children) return null;
-  return <p className="demo-note">{children}</p>;
-}
-
 export function Feedback({ children, tone = "success" }) {
   return children ? <p className={`form-feedback feedback-${tone}`} role="status" aria-live="polite">{children}</p> : null;
 }

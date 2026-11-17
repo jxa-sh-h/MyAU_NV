@@ -11,28 +11,27 @@ export const pages = {
   "student-clearance": { title: "Student Clearance", section: "Student Services", description: "Check account and conduct requirements that may affect clearance." },
   enrollment: { title: "Enrollment", section: "Enrollment", description: "Review your enrolled subjects, fees, and admission requirements." },
   "subjects-enrolled": { title: "Subjects Enrolled", section: "Enrollment", description: "Your registered subjects for the first semester of 2026–2027." },
-  "fees-paid-during-enrollment": { title: "Fees Paid During Enrollment", section: "Enrollment", description: "A record of enrollment fees in this demonstration account." },
-  "submit-admission-requirement": { title: "Submit Admission Requirements", section: "Enrollment", description: "Review sample admission requirements and simulate a document submission." },
+  "fees-paid-during-enrollment": { title: "Fees Paid During Enrollment", section: "Enrollment", description: "Review fees paid during enrollment." },
+  "submit-admission-requirement": { title: "Submit Admission Requirements", section: "Enrollment", description: "Review admission requirements and submitted documents." },
   "student-account": { title: "Student Account", section: "Student Account", description: "Review your student ledger and periodic dues." },
   ledger: { title: "Ledger", section: "Student Account", description: "A summary of charges and credits on your student account." },
   "periodic-dues": { title: "Periodic Dues", section: "Student Account", description: "Your installment schedule and upcoming due dates." },
   "academic-performance": { title: "Academic Performance", section: "Academic Records", description: "Review academic records and progress by category." },
   "check-list": { title: "Course Checklist", section: "Academic Performance", description: "Review degree requirements, earned units, and grades by term." },
-  "academic-awards-achievements": { title: "Awards and Achievements", section: "Academic Performance", description: "Academic recognition recorded in the sample profile." },
-  "grading-per-exam-period": { title: "Grades by Exam Period", section: "Academic Performance", description: "Review sample grades for each exam period." },
+  "academic-awards-achievements": { title: "Awards and Achievements", section: "Academic Performance", description: "Review academic awards and achievements." },
+  "grading-per-exam-period": { title: "Grades by Exam Period", section: "Academic Performance", description: "Review grades for each exam period." },
   "non-acad-performance": { title: "Non-Academic Performance", section: "Student Development", description: "Review organization membership and non-academic achievements." },
   membership: { title: "Membership", section: "Non-Academic Performance", description: "Student organizations and co-curricular participation." },
-  "non-acad-awards-achievements": { title: "Awards and Achievements", section: "Non-Academic Performance", description: "Non-academic recognition recorded in the sample profile." },
-  "discipline-monitoring": { title: "Discipline Monitoring", section: "Student Services", description: "Review demonstration notices and student conduct resources." },
-  "personal-information": { title: "Personal Information", section: "Student Profile", description: "Review and manage your demonstration profile information." },
-  "view-personal-info": { title: "View Personal Information", section: "Personal Information", description: "Sample profile information for this demonstration." },
-  "edit-personal-info": { title: "Edit Personal Information", section: "Personal Information", description: "Update demo contact information saved only in this browser." },
+  "non-acad-awards-achievements": { title: "Awards and Achievements", section: "Non-Academic Performance", description: "Review non-academic awards and achievements." },
+  "discipline-monitoring": { title: "Discipline Monitoring", section: "Student Services", description: "Review student conduct and active notices." },
+  "personal-information": { title: "Personal Information", section: "Student Profile", description: "Review and manage your profile information." },
+  "view-personal-info": { title: "View Personal Information", section: "Personal Information", description: "View your personal profile information." },
+  "edit-personal-info": { title: "Edit Personal Information", section: "Personal Information", description: "Update your address and contact information." },
   "print-personal-info": { title: "Print Personal Information", section: "Personal Information", description: "Print the current profile information." },
-  "change-password": { title: "Change Password", section: "Personal Information", description: "Validate a demonstration password without saving it." },
+  "change-password": { title: "Change Password", section: "Personal Information", description: "Enter and confirm a new password." },
   library: { title: "Library", section: "Library Services", description: "Explore library services and research resources." },
-  "ebsco-database": { title: "EBSCO Database", section: "Library Services", description: "Open the external EBSCO research database." },
-  "faculty-evaluation": { title: "Faculty Evaluation", section: "Student Services", description: "Share course feedback in this demonstration evaluation." },
-  "online-payment": { title: "Online Payment", section: "Student Account", description: "Review a simulated account balance and payment options." },
+  "faculty-evaluation": { title: "Faculty Evaluation", section: "Student Services", description: "Share feedback on your classes." },
+  "online-payment": { title: "Online Payment", section: "Student Account", description: "Review your account balance and payment options." },
 };
 
 export const navigationGroups = [
@@ -82,7 +81,6 @@ export const navigationGroups = [
 
 export const standalonePages = [
   ["library", "Library", "book", "/pages/library.html"],
-  ["ebsco-database", "EBSCO Database", "book", "/pages/ebsco-database.html"],
   ["faculty-evaluation", "Faculty Evaluation", "star", "/pages/faculty-evaluation.html"],
   ["online-payment", "Online Payment", "wallet", "/pages/online-payment.html"],
 ];
@@ -131,10 +129,10 @@ export const ledgerEntries = [
   ["07/16/2026", "Tuition Fee", "—", "48,056.00", "—", "48,056.00"],
   ["07/16/2026", "Miscellaneous Fee", "—", "6,848.00", "—", "54,904.00"],
   ["07/16/2026", "Other Charges", "—", "17,810.00", "—", "72,714.00"],
-  ["07/16/2026", "Enrollment/downpayment - Cash", "Demo", "—", "5,000.00", "67,714.00"],
+  ["07/16/2026", "Enrollment/downpayment - Cash", "Business Office", "—", "5,000.00", "67,714.00"],
   ["08/28/2026", "ACAD 25 (Grant)", "—", "—", "12,014.00", "55,700.00"],
-  ["11/03/2026", "Tuition - Cash", "Demo", "—", "10,000.00", "45,700.00"],
-  ["11/09/2026", "Tuition - Cash", "Demo", "—", "10,000.00", "35,700.00"],
+  ["11/03/2026", "Tuition - Cash", "Business Office", "—", "10,000.00", "45,700.00"],
+  ["11/09/2026", "Tuition - Cash", "Business Office", "—", "10,000.00", "35,700.00"],
 ];
 
 export const periodicDues = [

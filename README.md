@@ -1,6 +1,6 @@
 # MYAU Student Portal
 
-A responsive frontend concept for a student portal at Angeles University Foundation. All student details and records are fictional. The app does not connect to AUF systems or process official enrollment, document submissions, evaluations, or payments.
+A responsive student portal for Angeles University Foundation.
 
 ## Technology
 
@@ -26,10 +26,8 @@ npm run build
 npm run preview
 ```
 
-The root URL opens the demo login screen. Submitting the form continues to the portal without credential checks.
+The root URL opens the sign-in screen. It validates the configured account and opens the student portal.
 
 ## Page structure
 
-The portal sections all use `index.html` and are selected using its URL hash. The root login screen is a React route and does not add another HTML page. The only other HTML pages are `pages/library.html`, `pages/ebsco-database.html`, `pages/faculty-evaluation.html`, and `pages/online-payment.html`. Keep this structure unchanged unless a page or section change is explicitly requested.
-
-Mock submission metadata and evaluation previews are stored in the browser's local storage. No uploaded file contents or payment information are stored.
+The portal sections all use `index.html` and are selected using its URL hash. The root login screen is a React route and does not add another HTML page. The standalone HTML pages are `pages/library.html`, `pages/faculty-evaluation.html`, and `pages/online-payment.html`. The former `pages/ebsco-database.html` entry point redirects to the combined Library page. Keep this structure unchanged unless a page or section change is explicitly requested.

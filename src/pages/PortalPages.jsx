@@ -21,20 +21,10 @@ import { useLocalStorage } from "../hooks/useLocalStorage.js";
 import { useStudentProfile } from "../contexts/StudentProfileContext.jsx";
 import { demoAccounts } from "../data/demoAccounts.js";
 import Icon from "../components/Icon.jsx";
-import { Badge, DataTable, DemoNote, Feedback, PageHeading, Panel, SectionCards } from "../components/UI.jsx";
-
-const simulatedFees = [
-  ["Oct 01, 2026", "Enrollment assessment", "₱45,750.00", <Badge key="recorded">Recorded</Badge>],
-  ["Oct 02, 2026", "Initial installment · simulated", "₱20,000.00", <Badge key="simulated">Simulated</Badge>],
-  ["Oct 16, 2026", "Payment center fee · simulated", "₱250.00", <Badge key="simulated-fee">Simulated</Badge>],
-];
+import { Badge, DataTable, Feedback, PageHeading, Panel, SectionCards } from "../components/UI.jsx";
 
 function PageIntro({ page, children }) {
   return <PageHeading page={page}>{children}</PageHeading>;
-}
-
-function Note({ children }) {
-  return <DemoNote>{children}</DemoNote>;
 }
 
 function usePortalData() {
@@ -60,7 +50,6 @@ function Overview({ page, ids }) {
     <>
       <PageIntro page={page} />
       <SectionCards links={ids.map((id) => ({ id, title: pages[id].title, description: pages[id].description }))} />
-      <Note />
     </>
   );
 }
@@ -141,14 +130,14 @@ function Dashboard() {
           <section className="service-card dashboard-account-card">
             <div className="service-title"><img className="dashboard-brand-logo" src="/img/gmail_logo.png" alt="" aria-hidden="true" /><h2>MyAU Mail</h2></div>
             <a className="service-account-link" href="https://mail.auf.edu.ph/" target="_blank" rel="noopener noreferrer">{profile.email} <Icon name="external" /></a>
-            <details className="dashboard-help-details">
+            <details className="dashboard-help-details" open>
               <summary>Setup and support</summary>
               <div className="dashboard-help-copy">
                 <p><strong>New students:</strong> Your MyAU Mail account and login credentials are sent to your registered personal email after admission. Check your spam folder if they are missing.</p>
                 <p>For help, email <a href="mailto:mailadmin@auf.edu.ph">mailadmin@auf.edu.ph</a> and attach an image of your AUF ID or another identification document.</p>
               </div>
             </details>
-            <a className="service-action" href="https://mail.auf.edu.ph/" target="_blank" rel="noopener noreferrer">Sign in to MyAU Mail <Icon name="arrow" /></a>
+            <a className="service-action" href="https://mail.google.com/" target="_blank" rel="noopener noreferrer">Sign in to MyAU Mail <Icon name="arrow" /></a>
           </section>
           <section className="service-card dashboard-account-card">
             <div className="service-title"><img className="dashboard-brand-logo" src="/img/canvas_logo.png" alt="" aria-hidden="true" /><h2>MyClass · Canvas LMS</h2></div>
@@ -156,7 +145,7 @@ function Dashboard() {
               <a href="https://play.google.com/store/apps/details?id=com.instructure.candroid" target="_blank" rel="noopener noreferrer">Google Play</a>
               <a href="https://apps.apple.com/app/id480883488" target="_blank" rel="noopener noreferrer">App Store</a>
             </div>
-            <details className="dashboard-help-details">
+            <details className="dashboard-help-details" open>
               <summary>Login instructions and support</summary>
               <div className="dashboard-help-copy">
                 <p>Use your student ID as your username and your initial password to sign in. After logging in, change your password under <strong>Account → Settings → Edit Settings → Change Password</strong>.</p>
@@ -167,7 +156,6 @@ function Dashboard() {
           </section>
         </div>
       </section>
-      <Note />
     </>
   );
 }
@@ -215,12 +203,11 @@ function ClearancePage() {
           />
         </Panel>
       </section>
-      <Note />
     </>
   );
 }
 
-function SimpleDataPage({ page, title, headers, rows, label, subtitle, searchable = false, sortable = false, note, noteText, after }) {
+function SimpleDataPage({ page, title, headers, rows, label, subtitle, searchable = false, sortable = false, note, after }) {
   return (
     <>
       <PageIntro page={page} />
@@ -229,59 +216,75 @@ function SimpleDataPage({ page, title, headers, rows, label, subtitle, searchabl
       </Panel>
       {after}
       {note && <p className="table-total">{note}</p>}
-      <Note>{noteText}</Note>
     </>
   );
 }
 
 function AdmissionPage() {
   const { profile } = usePortalData();
-  const [submitted, setSubmitted] = useLocalStorage(`myau-admission-documents-${profile.id}`, []);
-  const [feedback, setFeedback] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [uploads, setUploads] = useState(() => profile.id === "24-1661-908" ? [
+    { id: "picture-name", name: "2x2.png", type: "image/png", url: "/submitted-requirements/2x2.png", uploadedAt: "06/22/2024", isObjectUrl: false },
+    { id: "birth-certificate", name: "PSA.jpg", type: "image/jpeg", url: "/submitted-requirements/PSA.jpg", uploadedAt: "06/22/2024", isObjectUrl: false },
+    { id: "official-receipt", name: "official_receipt.jpg", type: "image/jpeg", url: "/submitted-requirements/official_receipt.jpg", uploadedAt: "06/22/2024", isObjectUrl: false },
+    { id: "report-card", name: "report_card.jpg", type: "image/jpeg", url: "/submitted-requirements/report_card.jpg", uploadedAt: "06/22/2024", isObjectUrl: false },
+    { id: "good-moral", name: "good_moral.jpg", type: "image/jpeg", url: "/submitted-requirements/good_moral.jpg", uploadedAt: "06/22/2024", isObjectUrl: false },
+    { id: "picture", name: "2x2.png", type: "image/png", url: "/submitted-requirements/2x2.png", uploadedAt: "06/22/2024", isObjectUrl: false },
+  ] : []);
+  const [previewId, setPreviewId] = useState(null);
+  const pendingRequirements = [
+    { id: "passport", label: "For Filipinos born abroad — valid Philippine passport data pages and latest arrival stamp page" },
+    { id: "dual-citizenship", label: "For dual citizens — documentation for acquisition, reacquisition, or retention of Filipino citizenship" },
+  ];
+  const submittedRequirements = [
+    { id: "picture-name", label: "2×2 picture with name (clear, well-defined, white background)", date: "06/22/2024" },
+    { id: "birth-certificate", label: "PSA Birth Certificate (or issued by the country of origin)", date: "06/22/2024" },
+    { id: "official-receipt", label: "Official Receipt (for payment of application fee)", date: "06/22/2024" },
+    { id: "report-card", label: "Report Card (1st and 2nd Semester)", date: "06/22/2024" },
+    { id: "good-moral", label: "Good Moral Certificate", date: "06/22/2024" },
+    { id: "picture", label: "2×2 picture", date: "06/22/2024" },
+  ];
 
-  function submitDocument(event) {
-    event.preventDefault();
-    const form = event.currentTarget;
-    const file = form.elements.document.files[0];
+  function uploadDocument(event, requirement) {
+    const file = event.target.files?.[0];
     if (!file) return;
-    setLoading(true);
-    setFeedback("");
-    window.setTimeout(() => {
-      setSubmitted((items) => [...items, { id: `${Date.now()}-${file.name}`, name: file.name, submittedAt: new Date().toLocaleString() }]);
-      setFeedback(`Demo only: “${file.name}” was selected but not uploaded.`);
-      form.reset();
-      setLoading(false);
-    }, 350);
+    const url = URL.createObjectURL(file);
+    setUploads((items) => {
+      const existing = items.find((item) => item.id === requirement.id);
+      if (existing?.isObjectUrl) URL.revokeObjectURL(existing.url);
+      return [...items.filter((item) => item.id !== requirement.id), { ...requirement, name: file.name, type: file.type, url, uploadedAt: new Date().toLocaleString(), isObjectUrl: true }];
+    });
+    setPreviewId(requirement.id);
+    event.target.value = "";
   }
 
-  const requirementRows = [
-    ["Form 138 / Senior High School Record", <Badge key="received-1">Received</Badge>, "No action needed"],
-    ["PSA Birth Certificate", <Badge tone="warning" key="review">For review</Badge>, "Review in progress"],
-    ["Certificate of Good Moral Character", <Badge key="received-2">Received</Badge>, "No action needed"],
-  ];
+  function removeUpload(id) {
+    setUploads((items) => {
+      const existing = items.find((item) => item.id === id);
+      if (existing?.isObjectUrl) URL.revokeObjectURL(existing.url);
+      return items.filter((item) => item.id !== id);
+    });
+    if (previewId === id) setPreviewId(null);
+  }
+
+  function RequirementRow({ requirement, pending = false }) {
+    const upload = uploads.find((item) => item.id === requirement.id);
+    const previewOpen = previewId === requirement.id && upload;
+    const isImage = upload?.type.startsWith("image/");
+    const isPdf = upload?.type === "application/pdf";
+    return <article className="admission-requirement">
+      <div className="admission-requirement-copy"><h3>{requirement.label}</h3><p>{pending ? "Upload when this requirement applies to you." : `Record date: ${requirement.date}`}</p>{upload && <p className="admission-file-name">{upload.name}</p>}</div>
+      <div className="admission-requirement-actions"><label className="button button-secondary" htmlFor={`admission-${requirement.id}`}>{upload ? "Replace file" : "Upload file"}<input id={`admission-${requirement.id}`} type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={(event) => uploadDocument(event, requirement)} /></label>{upload && <><button className="text-button" type="button" onClick={() => setPreviewId(previewOpen ? null : requirement.id)}>{previewOpen ? "Hide preview" : "Preview"}</button><button className="text-button admission-remove" type="button" onClick={() => removeUpload(requirement.id)}>Remove</button></>}</div>
+      {previewOpen && <div className="admission-preview">{isImage ? <img src={upload.url} alt={`Preview of ${upload.name}`} /> : isPdf ? <iframe src={`${upload.url}#view=FitH`} title={`Preview of ${upload.name}`} /> : <a className="button button-secondary" href={upload.url} target="_blank" rel="noreferrer">Open selected file <Icon name="external" /></a>}</div>}
+    </article>;
+  }
 
   return (
     <>
       <PageIntro page={pages["submit-admission-requirement"]} />
-      <Panel title="Sample admission requirements"><DataTable headers={["Document", "Status", "Next step"]} rows={requirementRows} label="Admission requirement status" /></Panel>
-      <section className="panel form-panel">
-        <div className="panel-header"><div><h2>Submit a document</h2><p>Choose a file to simulate an admission requirement submission.</p></div></div>
-        <form className="demo-form" id="admission-form" onSubmit={submitDocument}>
-          <label htmlFor="admission-file">Document file</label>
-          <input id="admission-file" name="document" type="file" accept=".pdf,.jpg,.jpeg,.png" required />
-          <button className="button button-primary" type="submit" disabled={loading}>{loading ? <><span className="loading-spinner" />Submitting…</> : "Submit for demonstration"}</button>
-          <Feedback>{feedback}</Feedback>
-        </form>
-        <div className="submitted-documents">
-          <h3>Demo submissions</h3>
-          {submitted.length === 0 ? <p className="empty-state">No documents have been selected in this browser.</p> : submitted.map((item) => (
-            <div className="submitted-document" key={item.id}>
-              <span><strong>{item.name}</strong><small>{item.submittedAt}</small></span>
-              <button type="button" className="text-button" onClick={() => setSubmitted((items) => items.filter((saved) => saved.id !== item.id))}>Remove</button>
-            </div>
-          ))}
-        </div>
+      <section className="admission-page" aria-label="Admission requirements">
+        <div className="admission-intro"><h2>Admission requirements</h2><p>Select a requirement to upload a PDF or image and preview it before leaving this page.</p></div>
+        <section className="admission-group" aria-labelledby="pending-requirements-title"><h2 id="pending-requirements-title">Additional requirements, if applicable</h2>{pendingRequirements.map((requirement) => <RequirementRow requirement={requirement} pending key={requirement.id} />)}</section>
+        <section className="admission-group" aria-labelledby="submitted-requirements-title"><h2 id="submitted-requirements-title">Submitted requirements</h2>{submittedRequirements.map((requirement) => <RequirementRow requirement={requirement} key={requirement.id} />)}</section>
       </section>
     </>
   );
@@ -299,19 +302,27 @@ function PersonalContent({ pageId }) {
       ["Student ID", profile.id],
       ["Student name", profile.name],
       ["Email address", profile.email || "Not provided"],
-      ["Contact mobile", profile.contactMobile || "Not provided"],
       ["Program", profile.program],
       ["Year level", profile.yearLevel],
       ["Academic year", profile.academicYear],
+      ["Address", [profile.addressLine, profile.barangay, profile.city, profile.province].filter(Boolean).join(", ") || "Not provided"],
+      ["Contact mobile", profile.contactMobile || "Not provided"],
+      ["Alternate contact number", profile.alternateContact || "Not provided"],
+      ["Emergency contact", profile.emergencyContactName || "Not provided"],
+      ["Emergency contact number", profile.emergencyContactNumber || "Not provided"],
+      ["Relationship to emergency contact", profile.emergencyRelationship || "Not provided"],
     ];
     return (
       <>
         <PageIntro page={pages[pageId]} />
         <Panel title="Personal information">
+          <div className="profile-view-heading">
+            <img className="profile-photo" src="/submitted-requirements/2x2.png" alt="Student profile" />
+            <p>Student profile photo</p>
+          </div>
           <DataTable headers={["Information", "Details"]} rows={profileRows} label="Personal information" />
           <Link className="button button-primary personal-edit-button" to="/index.html#edit-personal-info">Edit personal information</Link>
         </Panel>
-        <Note>Personal details are fictional and saved only in this browser.</Note>
       </>
     );
   }
@@ -321,35 +332,66 @@ function PersonalContent({ pageId }) {
       const formData = new FormData(event.currentTarget);
       setProfile((currentProfile) => ({
         ...currentProfile,
-        name: formData.get("name").trim(),
-        email: formData.get("email").trim(),
+        addressLine: formData.get("address-line").trim(),
+        barangay: formData.get("barangay").trim(),
+        city: formData.get("city").trim(),
+        province: formData.get("province").trim(),
         contactMobile: formData.get("contact-mobile").trim(),
+        alternateContact: formData.get("alternate-contact").trim(),
+        emergencyContactName: formData.get("emergency-contact-name").trim(),
+        emergencyContactNumber: formData.get("emergency-contact-number").trim(),
+        emergencyRelationship: formData.get("emergency-relationship").trim(),
       }));
-      setFeedback("Personal information updated in this browser.");
+      setFeedback("Personal information updated.");
     }
 
     return (
       <>
         <PageIntro page={pages[pageId]} />
         <section className="panel form-panel">
-          <div className="panel-header"><div><h2>Edit contact information</h2><p>Changes are stored only in this browser and are not sent to AUF.</p></div></div>
-          <form className="demo-form" onSubmit={savePersonalInfo}>
-            <label htmlFor="personal-name">Student name</label>
-            <input id="personal-name" name="name" type="text" maxLength="100" defaultValue={profile.name} required />
-            <label htmlFor="personal-email">Email address</label>
-            <input id="personal-email" name="email" type="email" maxLength="254" defaultValue={profile.email} />
-            <label htmlFor="personal-mobile">Contact mobile</label>
-            <input id="personal-mobile" name="contact-mobile" type="tel" maxLength="30" defaultValue={profile.contactMobile} />
+          <div className="panel-header"><div><h2>Student profile and contact information</h2><p>Student identity details are fixed. Update your address and contact information below.</p></div></div>
+          <form className="demo-form profile-form" onSubmit={savePersonalInfo}>
+            <section className="profile-overview" aria-label="Student profile">
+              <div className="profile-photo-wrap">
+                <img className="profile-photo" src="/submitted-requirements/2x2.png" alt="Student profile" />
+                <span>2 × 2 profile photo</span>
+              </div>
+              <div className="profile-overview-details">
+                <h3>Fixed student information</h3>
+                <div className="profile-fixed-grid">
+                  <label htmlFor="personal-name">Student name<input id="personal-name" type="text" value={profile.name} disabled /></label>
+                  <label className="profile-field-wide" htmlFor="personal-email">Email address<input id="personal-email" type="email" value={profile.email ?? ""} title={profile.email ?? ""} disabled /></label>
+                  <label htmlFor="personal-id">Student ID<input id="personal-id" type="text" value={profile.id} disabled /></label>
+                  <label htmlFor="personal-program">Program<input id="personal-program" type="text" value={profile.program} disabled /></label>
+                  <label htmlFor="personal-year">Year level<input id="personal-year" type="text" value={profile.yearLevel} disabled /></label>
+                  <label htmlFor="personal-academic-year">Academic year<input id="personal-academic-year" type="text" value={profile.academicYear} disabled /></label>
+                </div>
+              </div>
+            </section>
+            <div className="profile-section-heading"><h3>Address and contact information</h3><p>Keep these details current so the university can reach you.</p></div>
+            <div className="profile-field-grid">
+              <label className="profile-field-wide" htmlFor="personal-address-line">House number and street<input id="personal-address-line" name="address-line" type="text" maxLength="150" defaultValue={profile.addressLine ?? ""} autoComplete="street-address" /></label>
+              <label htmlFor="personal-barangay">Barangay<input id="personal-barangay" name="barangay" type="text" maxLength="100" defaultValue={profile.barangay ?? ""} /></label>
+              <label htmlFor="personal-city">City / Municipality<input id="personal-city" name="city" type="text" maxLength="100" defaultValue={profile.city ?? ""} autoComplete="address-level2" /></label>
+              <label htmlFor="personal-province">Province<input id="personal-province" name="province" type="text" maxLength="100" defaultValue={profile.province ?? ""} autoComplete="address-level1" /></label>
+              <label htmlFor="personal-mobile">Contact mobile<input id="personal-mobile" name="contact-mobile" type="tel" maxLength="30" defaultValue={profile.contactMobile ?? ""} autoComplete="tel" /></label>
+              <label htmlFor="personal-alternate-contact">Alternate contact number<input id="personal-alternate-contact" name="alternate-contact" type="tel" maxLength="30" defaultValue={profile.alternateContact ?? ""} /></label>
+            </div>
+            <div className="profile-section-heading"><h3>Emergency contact</h3><p>Provide someone the university may contact if needed.</p></div>
+            <div className="profile-field-grid">
+              <label htmlFor="personal-emergency-name">Contact person<input id="personal-emergency-name" name="emergency-contact-name" type="text" maxLength="100" defaultValue={profile.emergencyContactName ?? ""} autoComplete="name" /></label>
+              <label htmlFor="personal-emergency-number">Contact number<input id="personal-emergency-number" name="emergency-contact-number" type="tel" maxLength="30" defaultValue={profile.emergencyContactNumber ?? ""} /></label>
+              <label htmlFor="personal-emergency-relationship">Relationship<input id="personal-emergency-relationship" name="emergency-relationship" type="text" maxLength="50" defaultValue={profile.emergencyRelationship ?? ""} /></label>
+            </div>
             <button className="button button-primary" type="submit">Save personal information</button>
             <Feedback>{feedback}</Feedback>
           </form>
         </section>
-        <Note>Student ID, program, year level, and academic year are read-only demonstration details.</Note>
       </>
     );
   }
   if (pageId === "print-personal-info") {
-    return <><PageIntro page={pages[pageId]} /><Panel title="Print Personal Info"><p className="panel-copy">Print the current personal information view for a local demonstration.</p><button className="button button-secondary" type="button" onClick={() => window.print()}>Print this page <Icon name="file" /></button></Panel><Note>Personal details are fictional.</Note></>;
+    return <><PageIntro page={pages[pageId]} /><Panel title="Print Personal Info"><p className="panel-copy">Print the current personal information view.</p><button className="button button-secondary" type="button" onClick={() => window.print()}>Print this page <Icon name="file" /></button></Panel></>;
   }
   function validatePassword(event) {
     event.preventDefault();
@@ -362,7 +404,7 @@ function PersonalContent({ pageId }) {
     setLoading(true);
     setFeedback("");
     window.setTimeout(() => {
-      setFeedback("Demo only: password validated but not saved.");
+      setFeedback("Your passwords match.");
       form.reset();
       setLoading(false);
     }, 300);
@@ -371,15 +413,14 @@ function PersonalContent({ pageId }) {
     <>
       <PageIntro page={pages[pageId]} />
       <section className="panel form-panel">
-        <div className="panel-header"><div><h2>Change Password</h2><p>Password changes are simulated and are not saved.</p></div></div>
+        <div className="panel-header"><div><h2>Change Password</h2><p>Enter and confirm your new password.</p></div></div>
         <form className="demo-form" id="password-form" onSubmit={validatePassword}>
           <label htmlFor="new-password">New password</label><input id="new-password" name="new-password" type="password" minLength="8" autoComplete="new-password" required />
           <label htmlFor="confirm-password">Confirm new password</label><input id="confirm-password" name="confirm-password" type="password" minLength="8" autoComplete="new-password" required />
-          <button className="button button-primary" type="submit" disabled={loading}>{loading ? <><span className="loading-spinner" />Validating…</> : "Validate demo password"}</button>
+          <button className="button button-primary" type="submit" disabled={loading}>{loading ? <><span className="loading-spinner" />Checking…</> : "Confirm new password"}</button>
           <Feedback tone={feedback.startsWith("The passwords") ? "error" : "success"}>{feedback}</Feedback>
         </form>
       </section>
-      <Note>Password changes do not affect any real account.</Note>
     </>
   );
 }
@@ -459,7 +500,6 @@ function CheckListPage() {
         </div>
         <p className="checklist-source-note">Course-level earned units and grades are shown only where the supplied academic record includes them.</p>
       </Panel>
-      <Note />
     </>
   );
 }
@@ -530,9 +570,9 @@ function GradingPage() {
         </form>
         {showGrades && (
           <section className="grading-results" aria-live="polite">
-            <p className="grading-note">Red grades are sample values that have not been verified by the registrar. “Not posted” means no grade is shown.</p>
+            <p className="grading-note">Gold-highlighted grades have not been verified by the registrar. “Not posted” means no grade is shown.</p>
             <h3>{examPeriod} Grades · {term} · {startYear}–{endYear}</h3>
-            {grades.length === 0 ? <p className="empty-state">No sample grade records are available for {term}, {startYear}–{endYear}.</p> : <div className="grading-table-scroll" role="region" aria-label={`${examPeriod} grades for ${term}, ${startYear}-${endYear}`} tabIndex="0">
+            {grades.length === 0 ? <p className="empty-state">No grade records are available for {term}, {startYear}–{endYear}.</p> : <div className="grading-table-scroll" role="region" aria-label={`${examPeriod} grades for ${term}, ${startYear}-${endYear}`} tabIndex="0">
               <table className="grading-table">
                 <thead>
                   <tr>
@@ -753,11 +793,19 @@ function EnrollmentPage({ pageId }) {
   );
 }
 
-function LibraryContent({ pageId }) {
-  if (pageId === "library") {
-    return <><PageIntro page={pages[pageId]} /><Panel title="Research databases"><p className="panel-copy">Access to licensed databases may require your AUF credentials.</p><Link className="button button-primary" to="/pages/ebsco-database.html">Open EBSCO Database <Icon name="arrow" /></Link></Panel></>;
-  }
-  return <><PageIntro page={pages[pageId]} /><Panel title="EBSCO research database"><p className="panel-copy">You may need to sign in with your AUF credentials to use licensed resources.</p><a className="button button-primary" href="https://search.ebscohost.com/" target="_blank" rel="noopener noreferrer">Continue to EBSCO <Icon name="arrow" /></a></Panel></>;
+function LibraryContent() {
+  return (
+    <>
+      <PageIntro page={pages.library} />
+      <Panel title="Library services">
+        <p className="panel-copy">Explore library resources and research databases. Access to licensed resources may require your AUF credentials.</p>
+      </Panel>
+      <Panel title="EBSCO research database">
+        <p className="panel-copy">Search scholarly journals, articles, and other academic resources through EBSCOhost.</p>
+        <a className="button button-primary" href="https://search.ebscohost.com/" target="_blank" rel="noopener noreferrer">Open EBSCO Database <Icon name="arrow" /></a>
+      </Panel>
+    </>
+  );
 }
 
 const evaluationSections = [
@@ -815,7 +863,7 @@ function FacultyEvaluation() {
         </div>
       </section>
       <section className="faculty-evaluation-form" ref={evaluationFormRef} aria-labelledby="faculty-evaluation-form-title">
-        <header className="faculty-evaluation-header"><h2 id="faculty-evaluation-form-title">Faculty teaching performance evaluation</h2><p>Rate each statement from 1 (Strongly disagree) to 5 (Strongly agree). Demo responses are stored on this device only.</p></header>
+        <header className="faculty-evaluation-header"><h2 id="faculty-evaluation-form-title">Faculty teaching performance evaluation</h2><p>Rate each statement from 1 (Strongly disagree) to 5 (Strongly agree).</p></header>
         {selectedFaculty ? <>
           <dl className="evaluation-context"><div><dt>Faculty</dt><dd>{selectedFaculty.faculty}</dd></div><div><dt>Subject</dt><dd>{selectedFaculty.code} · {selectedFaculty.title}</dd></div><div><dt>Class schedule</dt><dd>{selectedFaculty.schedule}</dd></div><div><dt>Academic year / semester</dt><dd>2026–2027 · First Semester</dd></div></dl>
           <form className="evaluation-question-form" onSubmit={submitEvaluation}>
@@ -837,7 +885,7 @@ function FacultyEvaluation() {
 function PaymentPage() {
   const [session] = useLocalStorage("myau-demo-session", null);
   const account = demoAccounts.find((item) => item.username === session?.username) ?? demoAccounts[0];
-  const profileStorageKey = account.username === "AUFAGUIRRE15" ? "myau-personal-info-AUFAGUIRRE15-v2" : "myau-personal-info-MYAUDEMO-v2";
+  const profileStorageKey = "myau-personal-info-AUFAGUIRRE15-v2";
   const [profile] = useLocalStorage(profileStorageKey, account.profile);
   const accountData = account.data ?? {};
   const activeBalance = accountData.currentBalance ?? currentBalance;
@@ -859,7 +907,7 @@ function PaymentPage() {
     setLoading(true);
     setFeedback("");
     window.setTimeout(() => {
-      setFeedback(`Demo preview ready for ${selectedPayment.label} using ${paymentMethod === "card" ? "card" : paymentMethod === "wallet" ? "e-wallet" : "online banking"}. No payment was processed.`);
+      setFeedback(`Payment preview ready for ${selectedPayment.label} using ${paymentMethod === "card" ? "card" : paymentMethod === "wallet" ? "e-wallet" : "online banking"}.`);
       setLoading(false);
     }, 450);
   }
@@ -879,7 +927,6 @@ function PaymentPage() {
           <div className="payment-checkout-main">
             <h2 id="make-payment-title">Make a payment</h2>
             <p>Choose what you would like to pay, then select a payment method.</p>
-            <p className="payment-demo-note">Demonstration only. No payment is processed.</p>
             <div className="payment-type-options" role="radiogroup" aria-label="Payment type">
               {paymentTypes.map((option) => <label className={`payment-type-option${paymentType === option.id ? " selected" : ""}`} key={option.id}>
                 <input type="radio" name="payment-type" value={option.id} checked={paymentType === option.id} onChange={() => { setPaymentType(option.id); setFeedback(""); }} />
@@ -924,7 +971,7 @@ export default function PortalPage({ pageId }) {
   if (["enrollment", "subjects-enrolled", "fees-paid-during-enrollment", "submit-admission-requirement", "student-account", "ledger", "periodic-dues"].includes(pageId)) return <EnrollmentPage pageId={pageId} />;
   if (["academic-performance", "non-acad-performance", ...academicSections.map(({ id }) => id), ...nonAcademicSections.map(({ id }) => id)].includes(pageId)) return <AcademicPage pageId={pageId} />;
   if (["personal-information", "view-personal-info", "edit-personal-info", "print-personal-info", "change-password"].includes(pageId)) return <PersonalContent pageId={pageId} />;
-  if (pageId === "library" || pageId === "ebsco-database") return <LibraryContent pageId={pageId} />;
+  if (pageId === "library") return <LibraryContent />;
   if (pageId === "faculty-evaluation") return <FacultyEvaluation />;
   if (pageId === "online-payment") return <PaymentPage />;
   return <PageIntro page={pages[pageId]} />;

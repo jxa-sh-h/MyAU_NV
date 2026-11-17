@@ -6,7 +6,7 @@ export function useLocalStorage(key, initialValue) {
       const stored = window.localStorage.getItem(key);
       return stored === null ? initialValue : JSON.parse(stored);
     } catch (error) {
-      console.error(`Unable to read local demo data for "${key}".`, error);
+      console.error(`Unable to read local data for "${key}".`, error);
       return initialValue;
     }
   });
@@ -15,7 +15,7 @@ export function useLocalStorage(key, initialValue) {
     try {
       window.localStorage.setItem(key, JSON.stringify(value));
     } catch (error) {
-      console.error(`Unable to save local demo data for "${key}".`, error);
+      console.error(`Unable to save local data for "${key}".`, error);
     }
   }, [key, value]);
 
