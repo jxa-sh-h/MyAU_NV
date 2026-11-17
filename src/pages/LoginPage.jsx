@@ -77,6 +77,11 @@ export default function LoginPage() {
                 <button className="login-password-toggle" type="button" onClick={() => setPasswordVisible((value) => !value)} aria-label={passwordVisible ? "Hide password" : "Show password"}>{passwordVisible ? "Hide" : "Show"}</button>
               </div>
               <button className="login-submit" type="submit">Login</button>
+              <div className="demo-credentials" aria-label="Demo account credentials">
+                <strong>Demo Account</strong>
+                <span>Username: <b>DEMO</b></span>
+                <span>Password: <b>MYAUDEMO</b></span>
+              </div>
             </form>
 
             <div className="login-actions">

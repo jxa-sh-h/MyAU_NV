@@ -6,7 +6,7 @@ import "../css/styles.css";
 import App from "./App.jsx";
 
 const demoStorageVersionKey = "myau-demo-storage-version";
-const demoStorageVersion = "2";
+const demoStorageVersion = "4";
 
 try {
   const storage = window.localStorage;
@@ -14,6 +14,11 @@ try {
     for (let index = storage.length - 1; index >= 0; index -= 1) {
       const key = storage.key(index);
       if (key?.startsWith("myau-")) storage.removeItem(key);
+    }
+    const sessionStorage = window.sessionStorage;
+    for (let index = sessionStorage.length - 1; index >= 0; index -= 1) {
+      const key = sessionStorage.key(index);
+      if (key?.startsWith("myau-")) sessionStorage.removeItem(key);
     }
     storage.setItem(demoStorageVersionKey, demoStorageVersion);
   }

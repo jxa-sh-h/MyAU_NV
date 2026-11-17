@@ -39,10 +39,15 @@ function usePortalData() {
     disciplineStatus: data.disciplineStatus ?? disciplineStatus,
     otherPendingClearances: data.otherPendingClearances ?? otherPendingClearances,
     gradingRecords: data.gradingRecords ?? gradingRecords,
+    checkListTerms: data.checkListTerms ?? checkListTerms,
     enrolledTerm: data.enrolledTerm ?? enrolledTerm,
     ledgerEntries: data.ledgerEntries ?? ledgerEntries,
+    ledgerTerms: data.ledgerTerms,
     periodicDues: data.periodicDues ?? periodicDues,
+    academicSections: data.academicSections ?? academicSections,
+    nonAcademicSections: data.nonAcademicSections ?? nonAcademicSections,
     fee: data.fee,
+    submittedRequirements: data.submittedRequirements,
   };
 }
 
@@ -58,7 +63,7 @@ function Overview({ page, ids }) {
 function Dashboard() {
   const { profile, currentBalance: activeBalance, notices: activeNotices, circulationDetails: activeCirculation, disciplineStatus: activeDiscipline, otherPendingClearances: activeClearances } = usePortalData();
   const today = new Intl.DateTimeFormat("en-PH", { weekday: "long", month: "long", day: "numeric", year: "numeric" }).format(new Date());
-  const hasPendingClearance = activeBalance.status === "Outstanding"
+  const hasPendingClearance = activeBalance.status !== "Paid"
     || activeDiscipline.activeNotices.length > 0
     || activeClearances.length > 0
     || activeCirculation.some(([item, value]) => /overdue|fine/i.test(item) && !/^₱?0(?:\.00)?$/.test(value.trim()));
@@ -186,7 +191,7 @@ function ClearancePage() {
         <h2 className="clearance-section-title" id="payment-clearance-title"><Icon name="wallet" /> Payment Clearance</h2>
         <Panel title="Current Balance" subtitle="Student account payment status">
           <p className="clearance-balance-line">
-            <Badge tone={status === "Outstanding" ? "warning" : "success"}>{status.toUpperCase()}</Badge>
+            <Badge tone={status === "Paid" ? "success" : "warning"}>{status.toUpperCase()}</Badge>
             <span aria-hidden="true">:</span>
             <strong>{amount}</strong>
           </p>
@@ -233,7 +238,7 @@ function SimpleDataPage({ page, title, headers, rows, label, subtitle, searchabl
 }
 
 function AdmissionPage() {
-  const { profile } = usePortalData();
+  const { profile, submittedRequirements: accountSubmittedRequirements } = usePortalData();
   const [uploads, setUploads] = useState(() => profile.id === "24-1661-908" ? [
     { id: "picture-name", name: "2x2.png", type: "image/png", url: "/submitted-requirements/2x2.png", uploadedAt: "06/22/2024", isObjectUrl: false },
     { id: "birth-certificate", name: "PSA.jpg", type: "image/jpeg", url: "/submitted-requirements/PSA.jpg", uploadedAt: "06/22/2024", isObjectUrl: false },
@@ -247,7 +252,7 @@ function AdmissionPage() {
     { id: "passport", label: "For Filipinos born abroad — valid Philippine passport data pages and latest arrival stamp page" },
     { id: "dual-citizenship", label: "For dual citizens — documentation for acquisition, reacquisition, or retention of Filipino citizenship" },
   ];
-  const submittedRequirements = [
+  const submittedRequirements = accountSubmittedRequirements ?? [
     { id: "picture-name", label: "2×2 picture with name (clear, well-defined, white background)", date: "06/22/2024" },
     { id: "birth-certificate", label: "PSA Birth Certificate (or issued by the country of origin)", date: "06/22/2024" },
     { id: "official-receipt", label: "Official Receipt (for payment of application fee)", date: "06/22/2024" },
@@ -296,7 +301,7 @@ function AdmissionPage() {
       <section className="admission-page" aria-label="Admission requirements">
         <div className="admission-intro"><h2>Admission requirements</h2><p>Select a requirement to upload a PDF or image and preview it before leaving this page.</p></div>
         <section className="admission-group" aria-labelledby="pending-requirements-title"><h2 id="pending-requirements-title">Additional requirements, if applicable</h2>{pendingRequirements.map((requirement) => <RequirementRow requirement={requirement} pending key={requirement.id} />)}</section>
-        <section className="admission-group" aria-labelledby="submitted-requirements-title"><h2 id="submitted-requirements-title">Submitted requirements</h2>{submittedRequirements.map((requirement) => <RequirementRow requirement={requirement} key={requirement.id} />)}</section>
+        <section className="admission-group" aria-labelledby="submitted-requirements-title"><h2 id="submitted-requirements-title">Submitted requirements</h2>{submittedRequirements.length > 0 ? submittedRequirements.map((requirement) => <RequirementRow requirement={requirement} key={requirement.id} />) : <p className="empty-state">No admission requirements have been submitted for this demo account.</p>}</section>
       </section>
     </>
   );
@@ -329,8 +334,10 @@ function PersonalContent({ pageId }) {
         <PageIntro page={pages[pageId]} />
         <Panel title="Personal information">
           <div className="profile-view-heading">
-            <img className="profile-photo" src="/submitted-requirements/2x2.png" alt="Student profile" />
-            <p>Student profile photo</p>
+            {profile.id === "00-0000-00"
+              ? <span className="profile-photo profile-demo-photo" aria-hidden="true">DA</span>
+              : <img className="profile-photo" src="/submitted-requirements/2x2.png" alt="Student profile" />}
+            <p>{profile.id === "00-0000-00" ? "Demo profile avatar" : "Student profile photo"}</p>
           </div>
           <DataTable headers={["Information", "Details"]} rows={profileRows} label="Personal information" />
           <Link className="button button-primary personal-edit-button" to="/index.html#edit-personal-info">Edit personal information</Link>
@@ -438,14 +445,14 @@ function PersonalContent({ pageId }) {
 }
 
 function CheckListPage() {
-  const { profile, subjects: activeSubjects } = usePortalData();
-  const activeCheckListTerms = profile.program === "BSCE"
+  const { profile, subjects: activeSubjects, checkListTerms: activeCheckListTerms } = usePortalData();
+  const terms = profile.program === "BSCE"
     ? [
       { year: "1st Year", semester: "2nd Semester", requiredUnits: 24, creditedUnits: 24, courses: activeSubjects.slice(0, 4).map(([code, title, , units], index) => ({ code, title, units: Number(units), earnedUnits: Number(units), grade: 88 + index, status: "passed" })) },
       { year: "2nd Year", semester: "1st Semester", requiredUnits: 24, creditedUnits: 24, courses: activeSubjects.slice(4).map(([code, title, , units], index) => ({ code, title, units: Number(units), earnedUnits: Number(units), grade: 90 + index, status: "passed" })) },
     ]
-    : checkListTerms;
-  const rowCount = Math.max(...activeCheckListTerms.map(({ courses }) => courses.length));
+    : activeCheckListTerms;
+  const rowCount = Math.max(...terms.map(({ courses }) => courses.length));
   const statusLabels = {
     passed: "Passed",
     "credit-short": "Credit below required units",
@@ -470,12 +477,12 @@ function CheckListPage() {
             <thead>
               <tr>
                 <th className="checklist-number-heading" scope="col" rowSpan="2">#</th>
-                {activeCheckListTerms.filter((_, index) => index % 2 === 0).map(({ year }) => (
+                {terms.filter((_, index) => index % 2 === 0).map(({ year }) => (
                   <th className="checklist-year-heading" scope="colgroup" colSpan="2" key={year}>{year}</th>
                 ))}
               </tr>
               <tr>
-                {activeCheckListTerms.map((term, index) => (
+                {terms.map((term, index) => (
                   <th className="checklist-term-heading" id={`checklist-term-${index + 1}`} scope="col" key={`${term.year}-${term.semester}`}>
                     <strong>{term.semester}</strong>
                     <span>Required {term.requiredUnits} · Credited {term.creditedUnits}</span>
@@ -520,10 +527,10 @@ function GradingPage() {
   const [examPeriod, setExamPeriod] = useState("Final");
   const [term, setTerm] = useState("2nd Semester");
   const [schoolYear, setSchoolYear] = useState("2025-2026");
-  const { profile, subjects: activeSubjects, gradingRecords: activeGrades } = usePortalData();
+  const { profile, subjects: activeSubjects, gradingRecords: activeGrades, checkListTerms: activeCheckListTerms } = usePortalData();
   const schoolYearLabel = schoolYear.replace("-", "–");
   const historicalYearLevel = schoolYear === "2024-2025" ? "1st Year" : schoolYear === "2025-2026" ? "2nd Year" : null;
-  const historicalTerm = checkListTerms.find((record) => record.year === historicalYearLevel && record.semester === term);
+  const historicalTerm = activeCheckListTerms.find((record) => record.year === historicalYearLevel && record.semester === term);
   const grades = historicalYearLevel && ["Midterm", "Final"].includes(examPeriod)
     ? (historicalTerm?.courses ?? []).filter((course) => course.grade !== undefined).map((course) => ({
       code: course.code,
@@ -537,15 +544,19 @@ function GradingPage() {
     : schoolYear === "2026-2027" && term === "1st Semester"
       ? activeSubjects.map(([code, title, , credit]) => {
         const record = activeGrades.find((item) => item.code === code);
-        const grade = examPeriod === "Midterm" ? record?.midtermGrade ?? "Not posted" : "Not posted";
+        const grade = examPeriod === "Midterm"
+          ? record?.midtermGrade ?? "Not posted"
+          : examPeriod === "Final"
+            ? record?.finalGrade ?? "Not posted"
+            : "Not posted";
         return {
           code,
           title,
           credit,
           instructor: record?.instructor ?? "Faculty member",
           grade,
-          remarks: examPeriod === "Midterm" ? "Passed" : "—",
-          isEncoded: examPeriod === "Midterm",
+          remarks: grade !== "Not posted" ? "Passed" : "—",
+          isEncoded: grade !== "Not posted",
         };
       })
       : [];
@@ -631,11 +642,12 @@ function GradingPage() {
 }
 
 function AcademicPage({ pageId }) {
-  if (pageId === "academic-performance") return <Overview page={pages[pageId]} ids={academicSections.map(({ id }) => id)} />;
-  if (pageId === "non-acad-performance") return <Overview page={pages[pageId]} ids={nonAcademicSections.map(({ id }) => id)} />;
+  const { academicSections: activeAcademicSections, nonAcademicSections: activeNonAcademicSections } = usePortalData();
+  if (pageId === "academic-performance") return <Overview page={pages[pageId]} ids={activeAcademicSections.map(({ id }) => id)} />;
+  if (pageId === "non-acad-performance") return <Overview page={pages[pageId]} ids={activeNonAcademicSections.map(({ id }) => id)} />;
   if (pageId === "check-list") return <CheckListPage />;
   if (pageId === "grading-per-exam-period") return <GradingPage />;
-  const item = [...academicSections, ...nonAcademicSections].find(({ id }) => id === pageId);
+  const item = [...activeAcademicSections, ...activeNonAcademicSections].find(({ id }) => id === pageId);
   return <SimpleDataPage page={pages[pageId]} title={item.title} subtitle={item.description} headers={["Item", "Details"]} rows={item.rows} label={item.title} />;
 }
 
@@ -664,6 +676,8 @@ function FeePaymentDocument() {
     : feePaymentSubjects;
   const totalUnits = documentSubjects.reduce((sum, [, , , , units]) => sum + Number(units), 0).toFixed(1);
   const feeData = fee ?? { tuition: "48,056.00", miscellaneous: "6,848.00", otherCharges: "17,810.00", assessment: "72,714.00", grant: "12,014.00", paid: "5,000.00", balance: "55,700.00" };
+  const chargeRows = feeData.otherChargesDetails ?? otherCharges;
+  const installmentRows = feeData.installments ?? [["PRELIM DUE", "18,500.00"], ["MIDTERM DUE", "18,500.00"], ["FINAL DUE", "18,700.00"]];
   const printedAt = new Intl.DateTimeFormat("en-PH", { dateStyle: "medium", timeStyle: "short" }).format(new Date());
   return (
     <>
@@ -677,9 +691,9 @@ function FeePaymentDocument() {
         </header>
 
         <section className="fee-student-details" aria-label="Student details">
-          <dl><div><dt>Student ID</dt><dd>{profile.id}</dd></div><div><dt>Student Name</dt><dd>{profile.name}</dd></div><div><dt>Student type</dt><dd>Old / Regular</dd></div></dl>
-          <dl><div><dt>Course/Major</dt><dd>{profile.program === "BSCE" ? "Bachelor of Science in Civil Engineering" : "Bachelor of Science in Computer Engineering"}</dd></div><div><dt>Year Level</dt><dd>{profile.yearLevel}</dd></div></dl>
-          <dl><div><dt>Gender</dt><dd>Male</dd></div></dl>
+          <dl><div><dt>Student ID</dt><dd>{profile.id}</dd></div><div><dt>Student Name</dt><dd>{profile.name}</dd></div><div><dt>Student type</dt><dd>{feeData.studentType ?? "Old / Regular"}</dd></div></dl>
+          <dl><div><dt>Course/Major</dt><dd>{profile.program === "BSCE" ? "Bachelor of Science in Civil Engineering" : profile.program.includes("(Demo)") ? "Bachelor of Science in Computer Engineering (Demo)" : "Bachelor of Science in Computer Engineering"}</dd></div><div><dt>Year Level</dt><dd>{profile.yearLevel}</dd></div></dl>
+          <dl><div><dt>Gender</dt><dd>{feeData.gender ?? "Male"}</dd></div></dl>
         </section>
 
         <section className="fee-subjects" aria-labelledby="fee-subjects-title">
@@ -695,13 +709,13 @@ function FeePaymentDocument() {
           <div className="fee-charge-summary">
             <dl><div><dt>TUITION FEE</dt><dd>{feeData.tuition}</dd></div><div><dt>MISCELLANEOUS FEES</dt><dd>{feeData.miscellaneous}</dd></div></dl>
             <h2>OTHER CHARGES</h2>
-            <dl>{otherCharges.map(([label, amount]) => <div key={label}><dt>{label}</dt><dd>{amount}</dd></div>)}<div className="fee-subtotal"><dt>TOTAL OTHER CHARGE</dt><dd>{feeData.otherCharges}</dd></div></dl>
-            <dl className="fee-grand-totals"><div><dt>TOTAL ASSESSMENT</dt><dd>Php {feeData.assessment}</dd></div><div><dt>OLD ACCOUNT</dt><dd>Php 0.00</dd></div><div><dt>SCHOLARSHIP/GRANT APPLIED</dt><dd>Php {feeData.grant}</dd></div><div><dt>BALANCE AFTER GRANT AND DOWNPAYMENT</dt><dd>Php {feeData.balance}</dd></div></dl>
+            <dl>{chargeRows.map(([label, amount]) => <div key={label}><dt>{label}</dt><dd>{amount}</dd></div>)}<div className="fee-subtotal"><dt>TOTAL OTHER CHARGE</dt><dd>{feeData.otherCharges}</dd></div></dl>
+            <dl className="fee-grand-totals"><div><dt>TOTAL ASSESSMENT</dt><dd>Php {feeData.assessment}</dd></div><div><dt>OLD ACCOUNT</dt><dd>Php {feeData.oldAccount ?? "0.00"}</dd></div><div><dt>SCHOLARSHIP/GRANT APPLIED</dt><dd>Php {feeData.grant}</dd></div><div><dt>BALANCE AFTER GRANT AND DOWNPAYMENT</dt><dd>Php {feeData.balance}</dd></div></dl>
           </div>
           <div className="fee-payment-summary">
-            <dl><div><dt>PAYMENT MODE</dt><dd>Installment</dd></div><div><dt>AMOUNT PAID</dt><dd>{feeData.paid}</dd></div><div><dt>DATE PAID</dt><dd>07/18/2026</dd></div><div><dt>PAYMENT TYPE</dt><dd>Cash</dd></div><div><dt>REFERENCE NUMBER</dt><dd>0007900</dd></div></dl>
+            <dl><div><dt>PAYMENT MODE</dt><dd>{feeData.paymentMode ?? "Installment"}</dd></div><div><dt>AMOUNT PAID</dt><dd>{feeData.paid}</dd></div><div><dt>DATE PAID</dt><dd>{feeData.datePaid ?? "07/18/2026"}</dd></div><div><dt>PAYMENT TYPE</dt><dd>{feeData.paymentType ?? "Cash"}</dd></div><div><dt>REFERENCE NUMBER</dt><dd>{feeData.referenceNumber ?? "0007900"}</dd></div></dl>
             <p className="fee-receipt">(Business Office) Receipt printed by: <u>{profile.name}</u></p>
-            <dl className="fee-installments"><div><dt>PRELIM DUE</dt><dd>18,500.00</dd></div><div><dt>MIDTERM DUE</dt><dd>18,500.00</dd></div><div><dt>FINAL DUE</dt><dd>18,700.00</dd></div></dl>
+            <dl className="fee-installments">{installmentRows.map(([period, amount]) => <div key={period}><dt>{period.toUpperCase()} DUE</dt><dd>{amount}</dd></div>)}</dl>
             <p className="fee-note">(NOTE: Above installment schedule may change based on actual payment and after enrolment adjustments.)</p>
           </div>
         </section>
@@ -747,10 +761,12 @@ const ledgerTerms = [
 ];
 
 function LedgerPage() {
-  const { ledgerEntries: activeLedgerEntries, currentBalance: activeBalance } = usePortalData();
+  const { ledgerEntries: activeLedgerEntries, ledgerTerms: activeLedgerTerms, currentBalance: activeBalance } = usePortalData();
   const [schoolYear, setSchoolYear] = useState("2026–2027");
   const [semester, setSemester] = useState("First Semester");
-  const accountLedgerTerms = [...ledgerTerms.slice(0, -1), { schoolYear: "2026–2027", semester: "First Semester", balance: activeBalance.amount.replace("₱", ""), entries: activeLedgerEntries }];
+  const ledgerTermSource = activeLedgerTerms ?? ledgerTerms;
+  const latestLedgerTerm = ledgerTermSource.at(-1);
+  const accountLedgerTerms = [...ledgerTermSource.slice(0, -1), { ...latestLedgerTerm, balance: activeBalance.amount.replace("₱", ""), entries: activeLedgerEntries }];
   const schoolYears = [...new Set(accountLedgerTerms.map(({ schoolYear: value }) => value))];
   const semesters = [...new Set(accountLedgerTerms.map(({ semester: value }) => value))];
   const visibleTerms = accountLedgerTerms.filter((term) => (schoolYear === "all" || term.schoolYear === schoolYear) && (semester === "all" || term.semester === semester));
@@ -977,7 +993,7 @@ function FacultyEvaluation() {
 function PaymentPage() {
   const [session] = useSessionStorage("myau-demo-session", null);
   const account = demoAccounts.find((item) => item.username === session?.username) ?? demoAccounts[0];
-  const profileStorageKey = "myau-personal-info-AUFAGUIRRE15-v2";
+  const profileStorageKey = account.profileStorageKey;
   const [profile] = useLocalStorage(profileStorageKey, account.profile);
   const accountData = account.data ?? {};
   const activeBalance = accountData.currentBalance ?? currentBalance;
@@ -990,8 +1006,8 @@ function PaymentPage() {
   const [feedback, setFeedback] = useState("");
   const paymentTypes = [
     { id: "installment", label: "Installment fee", description: "Pay a scheduled installment.", amount: `₱${activeDues[1][1]}` },
-    { id: "other-fee", label: "Other school fee", description: "Settle laboratory or service-related fees.", amount: "₱1,919.00" },
-    { id: "downpayment", label: "Downpayment", description: "Make an additional payment to your balance.", amount: "₱5,000.00" },
+    { id: "other-fee", label: "Other school fee", description: "Settle laboratory or service-related fees.", amount: `₱${activeFee.otherFeeAmount ?? "1,919.00"}` },
+    { id: "downpayment", label: "Downpayment", description: "Make an additional payment to your balance.", amount: `₱${activeFee.downpaymentAmount ?? "5,000.00"}` },
   ];
   const selectedPayment = paymentTypes.find(({ id }) => id === paymentType);
 

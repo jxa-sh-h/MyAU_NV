@@ -58,7 +58,9 @@ function StudentPanel({ profile, onLogout }) {
   return (
     <section className="student-panel" aria-label="Student information">
       <div className="student-panel-header">
-        <img className="avatar avatar-large avatar-photo" src="/submitted-requirements/2x2.png" alt="" />
+        {profile.id === "00-0000-00"
+          ? <span className="avatar avatar-large demo-avatar" aria-hidden="true">DA</span>
+          : <img className="avatar avatar-large avatar-photo" src="/submitted-requirements/2x2.png" alt="" />}
         <div className="student-info"><span className="student-id">{profile.id}</span><strong title={profile.name}>{profile.name}</strong></div>
         <button className="logout-button" type="button" onClick={onLogout}>Logout</button>
       </div>
@@ -80,7 +82,7 @@ export default function AppLayout({ activePage, children }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [session, setSession] = useSessionStorage("myau-demo-session", null);
   const account = demoAccounts.find((item) => item.username === session?.username) ?? demoAccounts[0];
-  const profileStorageKey = "myau-personal-info-AUFAGUIRRE15-v2";
+  const profileStorageKey = account.profileStorageKey;
   const [profile, setProfile] = useLocalStorage(profileStorageKey, account.profile ?? { ...student, email: "", contactMobile: "" });
   const activeSubjects = account.subjects ?? subjects;
   const menuButtonRef = useRef(null);
