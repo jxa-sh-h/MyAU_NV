@@ -34,7 +34,7 @@
 
 Use semantic HTML5, CSS3, and JavaScript (ES6+) with React functional components and hooks. Vite provides the development server and production build; React Router handles the four standalone page URLs and the portal's hash-based sections. Bootstrap is included as the CSS component framework alongside the project's AUF-inspired design tokens and custom styles. Use Git and GitHub for version control. Keep mock content separate from presentation, persist only demonstration data in browser local storage, and do not connect to a real backend or payment service.
 
-Proposed structure (introduce files as needed rather than building every page up front):
+Current source organization:
 
 ```text
 MYAU/
@@ -51,19 +51,32 @@ MYAU/
 │   │   ├── AppLayout.jsx
 │   │   ├── Icon.jsx
 │   │   └── UI.jsx
+│   ├── contexts/
+│   │   └── StudentProfileContext.jsx
 │   ├── data/
-│   │   └── mockData.js
+│   │   ├── demoAccounts.js
+│   │   ├── mockData.js
+│   │   └── routes.js
 │   ├── hooks/
-│   │   └── useLocalStorage.js
+│   │   ├── useActiveStudentAccount.js
+│   │   ├── useLocalStorage.js
+│   │   ├── useSessionStorage.js
+│   │   └── useStorageState.js
 │   ├── pages/
-│   │   └── PortalPages.jsx
+│   │   ├── EnrollmentPages.jsx
+│   │   ├── LoginPage.jsx
+│   │   ├── PaymentPage.jsx
+│   │   ├── PortalAcademicPages.jsx
+│   │   ├── PortalDashboardPages.jsx
+│   │   ├── PortalPageShared.jsx
+│   │   ├── PortalPages.jsx
+│   │   └── PortalResourcePages.jsx
 │   ├── App.jsx
 │   └── main.jsx
 ├── package.json
 ├── vite.config.js
 ├── docs/
 │   └── ui-foundation.md
-└── tests/
 ```
 
 Dashboard, Student Clearance, Enrollment and its children, Student Account and its children, Academic Performance and its child sections, Non-Acad Performance and its child sections, Discipline Monitoring, and Personal Information and its child sections are hash-routed sections in `index.html`. Only Library, EBSCO Database, Faculty Evaluation, and Online Payment have separate HTML files. This page/section structure is fixed unless explicitly changed. Shared navigation, student information, layout, and styles are reused; navigation metadata and fictional sample records live in `src/data/mockData.js`.

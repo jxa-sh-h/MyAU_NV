@@ -452,7 +452,7 @@ tbody tr:hover { background: #fbfcfd; }
 .payment-help { display: grid; grid-template-columns: minmax(240px, .75fr) minmax(0, 1.25fr); gap: 24px; align-items: center; min-height: 265px; padding: 25px 28px; border: 1px solid #ecdcae; border-radius: 17px; background: #fffcf4; }
 .payment-help > div > p:not(.payment-eyebrow) { margin: 8px 0 17px; color: var(--muted-dark); font-size: 11px; line-height: 1.6; }
 .payment-help-actions { display: flex; align-items: center; gap: 13px; }
-.payment-help iframe { width: 100%; height: 210px; border: 1px solid #e1d5b4; border-radius: 9px; background: #fff; }
+.payment-help iframe { width: 100%; height: 480px; border: 1px solid #e1d5b4; border-radius: 9px; background: #fff; }
 .payment-account-details { padding: 25px 28px; border: 1px solid #dbe5ed; border-radius: 17px; background: #fff; box-shadow: 0 6px 18px rgb(22 46 67 / 5%); }
 .payment-section-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 15px; margin-bottom: 19px; }
 .payment-section-heading > span { padding: 5px 9px; border-radius: 99px; color: var(--teal-700); background: var(--teal-100); font-size: 9px; font-weight: 800; }
@@ -691,7 +691,7 @@ tbody tr:hover { background: #fbfcfd; }
   .payment-method-options label { min-height: 0; }
   .payment-order-summary { display: block; }
   .payment-order-summary dl { margin: 16px 0 20px; }
-  .payment-help iframe { height: 180px; }
+  .payment-help iframe { height: min(60vh, 460px); min-height: 320px; }
   .evaluation-context { grid-template-columns: 1fr; }
   .evaluation-question { grid-template-columns: 1fr; gap: 8px; }
   .rating-options { justify-content: flex-start; }
@@ -1138,7 +1138,7 @@ img { max-width: 100%; height: auto; }
   .fee-subjects td::before { color: #4b5661; content: attr(data-label); font-size: 8px; font-weight: 700; }
   .fee-total-units { width: 100%; margin-top: 10px !important; }
   .fee-payment-summary > dl, .fee-installments { width: 100% !important; }
-  .payment-help iframe { min-height: 150px; }
+  .payment-help iframe { min-height: 320px; }
   .grading-table-scroll { overflow-x: auto; }
   .ledger-filter-panel { align-items: stretch; flex-direction: column; gap: 14px; padding: 16px; }
   .ledger-filter-panel > div:first-child { min-width: 0; }

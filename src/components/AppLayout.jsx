@@ -1,25 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { navigationGroups, pages, standalonePages, student, subjects } from "../data/mockData.js";
-import { useLocalStorage } from "../hooks/useLocalStorage.js";
+import { navigationGroups, pages, standalonePages, subjects } from "../data/mockData.js";
+import { isStandalonePage, routeForPage } from "../data/routes.js";
 import { StudentProfileContext } from "../contexts/StudentProfileContext.jsx";
-import { demoAccounts } from "../data/demoAccounts.js";
 import HelpSupport from "./HelpSupport.jsx";
 import Icon from "./Icon.jsx";
-import { useSessionStorage } from "../hooks/useSessionStorage.js";
-
-function routeFor(id) {
-  const standalone = standalonePages.find(([pageId]) => pageId === id);
-  return standalone ? standalone[3] : `/index.html#${id}`;
-}
+import { useActiveStudentAccount } from "../hooks/useActiveStudentAccount.js";
 
 function NavLink({ id, label, icon, activePage, onNavigate, className = "" }) {
   const isActive = activePage === id;
   return (
     <Link
       className={`${className || "nav-link"}${isActive ? " active" : ""}`}
-      to={routeFor(id)}
-      aria-current={isActive ? (standalonePages.some(([pageId]) => pageId === id) ? "page" : "location") : undefined}
+      to={routeForPage(id)}
+      aria-current={isActive ? (isStandalonePage(id) ? "page" : "location") : undefined}
       onClick={onNavigate}
     >
       {icon && <Icon name={icon} />}
@@ -80,10 +74,7 @@ function StudentPanel({ profile, onLogout }) {
 export default function AppLayout({ activePage, children }) {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [session, setSession] = useSessionStorage("myau-demo-session", null);
-  const account = demoAccounts.find((item) => item.username === session?.username) ?? demoAccounts[0];
-  const profileStorageKey = account.profileStorageKey;
-  const [profile, setProfile] = useLocalStorage(profileStorageKey, account.profile ?? { ...student, email: "", contactMobile: "" });
+  const { setSession, account, profile, setProfile } = useActiveStudentAccount();
   const activeSubjects = account.subjects ?? subjects;
   const menuButtonRef = useRef(null);
   const sidebarRef = useRef(null);
