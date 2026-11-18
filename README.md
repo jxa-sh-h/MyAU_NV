@@ -1,41 +1,80 @@
 # MYAU Student Portal
 
-A responsive student portal for Angeles University Foundation.
+A responsive, static React demonstration of a student portal for Angeles University Foundation (AUF). It presents fictional student records and simulated workflows for academic information, enrollment, clearance, student accounts, and campus services.
+
+> This is a demonstration only. It does not connect to AUF systems, submit real documents, or process payments.
+
+![MYAU dashboard on desktop](docs/screenshots/dashboard-desktop.png)
+
+## Highlights
+
+- Responsive login and portal shell with desktop sidebar and mobile navigation
+- Dashboard notices, student clearance, personal information, and simulated submissions
+- Enrollment, subject checklist, academic performance, awards, and OJT/field-work sections
+- Student account ledger, periodic dues, fees, and online-payment information
+- Standalone Documents, Library, Faculty Evaluation, and Online Payment pages
+- Fictional demo data with browser session/local-storage persistence for safe interaction
+- Accessible semantic controls, responsive tables, visible focus states, and reduced-motion support
 
 ## Technology
 
-- HTML5, CSS3, and JavaScript (ES6+)
-- React functional components and hooks
-- Vite development server and production build
-- React Router for the four standalone pages and hash-based portal sections
-- Bootstrap CSS with the MYAU design system
+- React 19 with functional components and hooks
+- React Router 7 for login, standalone pages, redirects, and hash-based portal sections
+- Vite 7 for development and production builds
+- Bootstrap 5 plus the custom MYAU design system in `css/styles.css`
+- Node.js 20.19+ or 22.12+
 
 ## Run locally
-
-Requires Node.js 20.19+ or 22.12+.
 
 ```sh
 npm install
 npm run dev
 ```
 
-Open the local URL printed by Vite. Build and preview the static site with:
+Open the local URL printed by Vite. To create and preview a production build:
 
 ```sh
 npm run build
 npm run preview
 ```
 
-The root URL opens the sign-in screen. It validates the configured account and opens the student portal.
+The project currently has no automated test script; use the production build as the baseline verification command.
+
+## Demo accounts
+
+Use either account on the login screen:
+
+| Username | Password | Use |
+| --- | --- | --- |
+| `DEMO` | `MYAUDEMO` | Recommended account with clearly fictional records |
+| `AUFAGUIRRE15` | `08642QWE` | Sample student profile and records |
+
+These credentials are intentionally stored in `src/data/demoAccounts.js` and must not be treated as real authentication secrets.
+
+## Routes and page structure
+
+The root route (`/` or `/login`) opens the sign-in screen. After sign-in, the portal is served from `/index.html`; portal sections are selected with hashes, for example `/index.html#dashboard` and `/index.html#student-clearance`.
+
+Standalone pages are available at:
+
+- `/pages/documents.html`
+- `/pages/library.html`
+- `/pages/faculty-evaluation.html`
+- `/pages/online-payment.html`
+
+The legacy `/pages/ebsco-database.html` entry point redirects to the combined Library page. The legacy `discipline-monitoring` hash redirects to Student Clearance.
 
 ## Source organization
 
-- `src/App.jsx` defines the login, hash-based portal, and standalone routes. `src/data/routes.js` shares route resolution between the router and sidebar.
-- `src/pages/PortalPages.jsx` dispatches portal sections to feature modules: dashboard, academic, enrollment, resources, and payment.
-- `src/pages/PortalPageShared.jsx` contains shared portal data and page helpers; reusable UI primitives live in `src/components/`.
-- `src/hooks/useActiveStudentAccount.js` resolves the current demo account and profile. `useLocalStorage` and `useSessionStorage` share their persistence implementation through `useStorageState`.
-- Fictional records and navigation metadata remain in `src/data/`.
+- `src/App.jsx` defines application routes and legacy redirects.
+- `src/data/mockData.js` contains shared page metadata, navigation, and fictional records.
+- `src/data/demoAccounts.js` contains local demo profiles and account-specific sample data.
+- `src/components/` contains the shared application shell and UI primitives.
+- `src/pages/` contains portal feature modules and standalone page views.
+- `src/hooks/` and `src/contexts/` contain browser persistence and student-profile state.
+- `pages/` contains standalone HTML entry points; `public/` contains static assets.
+- `docs/ui-foundation.md` records visual, accessibility, and implementation guidelines.
 
-## Page structure
+## Project notes
 
-The portal sections all use `index.html` and are selected using its URL hash. The root login screen is a React route and does not add another HTML page. The standalone HTML pages are `pages/documents.html`, `pages/library.html`, `pages/faculty-evaluation.html`, and `pages/online-payment.html`. The former `pages/ebsco-database.html` entry point redirects to the combined Library page. Keep this structure unchanged unless a page or section change is explicitly requested.
+Keep the existing page/section structure intact when changing a feature. Enrollment, document, payment, and evaluation interactions are simulations, and uploaded file contents or payment credentials must never be persisted.
