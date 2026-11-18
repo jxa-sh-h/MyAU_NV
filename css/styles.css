@@ -745,6 +745,9 @@ tbody tr:hover { background: #fbfcfd; }
   .sidebar, .menu-toggle, .sidebar-scrim, .page-footer, .document-page-actions, .print-action { display: none !important; }
   .app-layout, .main-content, #page-content { display: block; width: 100%; min-height: 0; margin: 0; padding: 0; }
   .fee-payment-document { width: 100%; margin: 0; padding: 0; border: 0; box-shadow: none; font-size: calc(10px + 3pt); }
+  /* Keep every text element on the printed fee statement at one compact size. */
+  .fee-payment-document,
+  .fee-payment-document * { font-size: 13px !important; }
   .fee-payment-document, .fee-payment-document * { color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .subjects-enrolled-paper { margin: 0; border: 0; border-radius: 0; box-shadow: none; }
   .subjects-enrolled-paper .table-scroll { overflow: visible; }
