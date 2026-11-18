@@ -150,9 +150,9 @@ export default function AppLayout({ activePage, children }) {
         </button>
         {menuOpen && <button className="sidebar-scrim" type="button" aria-label="Close navigation" tabIndex="-1" onClick={closeMenu} />}
         <aside ref={sidebarRef} className={`sidebar${menuOpen ? " is-open" : ""}`} id="sidebar" aria-label="Main navigation" onKeyDown={trapSidebarFocus}>
-          <Link className="sidebar-brand" to="/index.html#dashboard" onClick={closeMenu} aria-label="MyAU Student Portal home">
+          <Link className="sidebar-brand" to="/index.html#dashboard" onClick={closeMenu} aria-label="MyAU Automated University home">
             <img className="sidebar-brand-logo" src="/img/MYAU_logo.png" alt="" aria-hidden="true" />
-            <span><strong>MyAU</strong><small>STUDENT PORTAL</small></span>
+            <span><strong>MyAU</strong><small>AUTOMATED UNIVERSITY</small></span>
           </Link>
           <StudentPanel profile={profile} onLogout={logout} />
           <nav className="primary-nav" aria-label="Student portal">

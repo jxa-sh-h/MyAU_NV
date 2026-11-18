@@ -57,8 +57,8 @@ button:focus-visible, a:focus-visible { outline: none; box-shadow: var(--focus);
 .login-card h2 { margin: 0; color: #16385c; font-family: Manrope, "Segoe UI", sans-serif; font-size: calc(23px + 3pt); font-weight: 800; letter-spacing: -.04em; text-align: left; }
 .login-card-heading p { margin: 7px 0 0; color: #6a7886; font-size: calc(13px + 3pt); }
 .login-form { display: flex; flex-direction: column; }
-.demo-credentials { display: grid; gap: 4px; margin: 8px 0 0; padding: 11px 12px; border: 1px solid #dce5ee; border-radius: 9px; color: #53657a; background: #f3f6fb; font-size: calc(11px + 3pt); }
-.demo-credentials strong { margin-bottom: 2px; color: var(--blue-950); font-size: calc(12px + 3pt); }
+.demo-credentials { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 14px; margin: 8px 0 0; padding: 10px 12px; border: 1px solid #e8ebf2; border-radius: 9px; color: #718093; background: #fafbfc; font-size: calc(11px + 3pt); text-align: center; }
+.demo-credentials strong { grid-column: 1 / -1; margin-bottom: 1px; color: #52617a; font-size: calc(12px + 3pt); }
 .demo-credentials b { color: var(--blue-900); font-weight: 750; }
 .login-form label { margin: 0 0 8px; color: #364d62; font-size: calc(12px + 3pt); font-weight: 700; }
 .login-form input { width: 100%; min-height: 49px; margin: 0 0 18px; padding: 11px 13px; border: 1px solid #d5dee6; border-radius: 9px; color: #1c2c3c; background: #fff; font: inherit; transition: border-color .15s ease, box-shadow .15s ease; }
@@ -159,7 +159,7 @@ button:focus-visible, a:focus-visible { outline: none; box-shadow: var(--focus);
 .sidebar-brand-logo { display: block; width: 38px; height: 38px; flex: 0 0 38px; border-radius: 9px; object-fit: contain; }
 .sidebar-brand > span:last-child { display: flex; flex-direction: column; gap: 2px; }
 .sidebar-brand strong { font-family: Manrope, sans-serif; font-size: calc(14px + 1.5pt); letter-spacing: .04em; }
-.sidebar-brand small { color: #d4e0ff; font-size: calc(8px + 1.5pt); font-weight: 700; letter-spacing: .1em; }
+.sidebar-brand small { max-width: 180px; color: #d4e0ff; font-size: 8px; font-weight: 700; letter-spacing: .07em; line-height: 1.25; }
 .student-panel { margin-bottom: 13px; border: 1px solid rgb(255 255 255 / 35%); background: rgb(5 39 160 / 30%); box-shadow: none; }
 .student-info strong, .student-meta strong { color: #fff; }
 .student-id, .student-meta small { color: #d4e0ff; }
@@ -229,9 +229,10 @@ h1, h2, h3 { font-family: Manrope, "Segoe UI", sans-serif; }
 .summary-label { color: var(--muted); font-size: calc(10px + 3pt); font-weight: 600; }
 .summary-value { color: var(--blue-950); font-family: Manrope, sans-serif; font-size: calc(18px + 3pt); font-weight: 800; letter-spacing: -.03em; }
 .summary-meta { color: var(--muted); font-size: calc(9px + 3pt); }
-.summary-card { display: grid; grid-template-columns: 52px minmax(0, 1fr) minmax(0, 1fr); align-items: center; }
-.summary-description { display: flex; min-width: 0; flex-direction: column; gap: 4px; }
-.summary-title { min-width: 0; color: var(--blue-950); font-family: Manrope, sans-serif; font-size: calc(17px + 3pt); line-height: 1.18; overflow-wrap: anywhere; }
+.summary-card { display: grid; grid-template-columns: 48px minmax(0, 1fr); grid-template-rows: auto auto; align-items: center; gap: 4px 14px; }
+.summary-card .summary-icon { grid-row: 1 / -1; }
+.summary-description { display: flex; grid-column: 2; grid-row: 2; min-width: 0; flex-direction: column; gap: 4px; }
+.summary-title { grid-column: 2; grid-row: 1; min-width: 0; color: var(--blue-950); font-family: Manrope, sans-serif; font-size: 17px; line-height: 1.2; overflow-wrap: anywhere; }
 .dashboard-columns { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(255px, .9fr); gap: 17px; }
 .panel { min-width: 0; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: white; box-shadow: 0 2px 8px rgb(22 46 67 / 2%); }
 .panel-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 17px 19px; border-bottom: 1px solid #edf0f3; }
@@ -274,7 +275,9 @@ h1, h2, h3 { font-family: Manrope, "Segoe UI", sans-serif; }
 .content-panel .panel-header h2, .form-panel .panel-header h2 { margin: 0; color: var(--blue-950); font-family: Manrope, "Segoe UI", sans-serif; font-size: calc(14px + 3pt); font-weight: 800; }
 .content-panel .panel-header p, .form-panel .panel-header p { margin: 5px 0 0; color: var(--muted); font-size: calc(10px + 3pt); }
 .panel-copy { max-width: 700px; margin: 0 0 17px; color: var(--muted-dark); font-size: calc(12px + 3pt); line-height: 1.7; }
-.table-scroll { width: 100%; overflow-x: auto; overscroll-behavior-x: contain; }
+.table-scroll { width: 100%; margin-bottom: 14px; overflow-x: auto; overscroll-behavior-x: contain; }
+.table-scroll { padding-bottom: 10px; }
+.subjects-enrolled-paper .table-scroll { margin-bottom: 14px; padding-bottom: 2px; }
 .table-scroll:focus-visible { outline: none; box-shadow: var(--focus); }
 table { width: 100%; border-collapse: collapse; color: var(--ink); font-size: calc(11px + 3pt); text-align: left; }
 th { padding: 11px 13px; color: var(--muted-dark); background: #f7f9fb; font-size: calc(9px + 3pt); font-weight: 700; letter-spacing: .035em; white-space: nowrap; }
@@ -288,7 +291,8 @@ tbody tr:hover { background: #fbfcfd; }
 .checklist-status-swatch.status-credit-short { background: #fff0cf; }
 .checklist-status-swatch.status-enrolled { background: #fff8cc; }
 .checklist-status-swatch.status-no-credit { background: #eef2f5; }
-.checklist-scroll { width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; overscroll-behavior-x: contain; }
+.checklist-scroll { width: 100%; margin-bottom: 14px; overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; overscroll-behavior-x: contain; }
+.checklist-scroll { padding-bottom: 10px; }
 .checklist-scroll:focus-visible { outline: none; box-shadow: var(--focus); }
 .checklist-table { width: 100%; min-width: 1370px; table-layout: fixed; border-collapse: separate; border-spacing: 0; font-size: calc(10px + 3pt); }
 .checklist-table th { padding: 9px 8px; border-right: 1px solid #dce5eb; border-bottom: 1px solid #dce5eb; text-align: center; white-space: normal; }
@@ -326,15 +330,15 @@ tbody tr:hover { background: #fbfcfd; }
 .checklist-list-term { overflow: hidden; border: 1px solid #dbe2f0; border-radius: 10px; }
 .checklist-list-term header { padding: 11px 13px; color: #fff; background: var(--blue-900); }
 .checklist-list-term header div { display: flex; justify-content: space-between; gap: 10px; }
-.checklist-list-term header strong, .checklist-list-term header span { font-size: 11px; }
-.checklist-list-term header span { color: #dbe7ff; font-size: 10px; text-align: right; }
+.checklist-list-term header strong, .checklist-list-term header span { font-size: 13px; }
+.checklist-list-term header span { color: #dbe7ff; font-size: 11px; text-align: right; }
 .checklist-list-courses { display: grid; }
 .checklist-list-course { display: flex; justify-content: space-between; gap: 14px; padding: 11px 13px; border-top: 1px solid #e6edf2; border-left: 4px solid transparent; background: #fff; }
 .checklist-list-course > div:first-child { display: grid; min-width: 0; gap: 3px; }
-.checklist-list-course > div:first-child strong { color: var(--blue-950); font-size: 11px; }
-.checklist-list-course > div:first-child span { color: var(--ink); font-size: 11px; line-height: 1.35; overflow-wrap: anywhere; }
-.checklist-list-meta { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 5px 8px; color: var(--muted-dark); font-size: 10px; text-align: right; }
-.checklist-list-meta b, .checklist-list-meta em { padding: 3px 6px; border-radius: 6px; color: var(--blue-950); background: #edf2fb; font-size: 9px; font-style: normal; white-space: nowrap; }
+.checklist-list-course > div:first-child strong { color: var(--blue-950); font-size: 13px; }
+.checklist-list-course > div:first-child span { color: var(--ink); font-size: 13px; line-height: 1.4; overflow-wrap: anywhere; }
+.checklist-list-meta { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px 9px; color: var(--muted-dark); font-size: 13px; text-align: right; }
+.checklist-list-meta b, .checklist-list-meta em { padding: 4px 7px; border-radius: 6px; color: var(--blue-950); background: #edf2fb; font-size: 11px; font-style: normal; white-space: nowrap; }
 .checklist-list-course.status-passed { border-left-color: #3190be; background: #f5fbfe; }
 .checklist-list-course.status-credit-short { border-left-color: #d59220; background: #fffaf0; }
 .checklist-list-course.status-enrolled { border-left-color: #d2a323; background: #fffdf1; }
@@ -856,6 +860,9 @@ tbody tr:hover { background: #f0f3fa; }
 .table-scroll td { border-color: #edf0f4; }
 .table-scroll .table-code-cell { color: var(--blue-800); font-weight: 800; letter-spacing: .015em; white-space: nowrap; }
 .table-scroll .table-numeric-cell { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.table-scroll .two-column-detail-table th:last-child,
+.table-scroll .two-column-detail-table td:last-child { width: 28%; text-align: left; white-space: normal; }
+.table-scroll .two-column-detail-table .table-numeric-cell { text-align: left; }
 .table-scroll .table-last-cell { color: var(--blue-950); font-weight: 750; }
 .table-scroll .table-last-cell.table-numeric-cell { color: var(--blue-900); }
 .table-scroll .table-status-good, .table-scroll .table-status-attention, .table-scroll .table-status-info { font-weight: 700; white-space: nowrap; }
@@ -1402,7 +1409,7 @@ img { max-width: 100%; height: auto; }
   .payment-method-options { grid-template-columns: 1fr; }
   .payment-summary-card { align-items: stretch; flex-direction: column; padding: 20px; }
   .payment-balance-overview { min-width: 0; }
-  .summary-card { display: grid; grid-template-columns: 42px minmax(74px, .85fr) minmax(96px, 1fr); gap: 9px; align-items: center; min-height: 0; padding: 13px 11px; }
+  .summary-card { display: grid; grid-template-columns: 42px minmax(0, 1fr); grid-template-rows: auto auto; gap: 3px 12px; align-items: center; min-height: 0; padding: 13px 11px; }
   .summary-icon { width: 42px; height: 42px; border-radius: 11px; }
   .summary-icon svg { width: 22px; height: 22px; }
   .summary-description { gap: 3px; }

@@ -88,7 +88,7 @@ export function DataTable({ headers, rows, label, searchable = false, sortable =
         </div>
       )}
       <div className="table-scroll" role="region" aria-label={label} tabIndex="0">
-        <table>
+          <table className={headers.length === 2 && headers[0] === "Item" && headers[1] === "Details" ? "two-column-detail-table" : undefined}>
           <thead>
             <tr>{headers.map((header, index) => (
               <th scope="col" key={header}>
